@@ -1,0 +1,48 @@
+{
+  "name": "tiktok-creator-outreach",
+  "version": "1.0.0",
+  "description": "TikTok Shop creator outreach specialist — search marketplace creators, analyze performance, and batch send collaboration messages.",
+  "author": {
+    "name": "Ben",
+    "email": "ben@scorehub.io"
+  },
+  "agents": ["./agents/tiktok-creator-outreach.md"],
+  "skills": [
+    "./skills/tiktok-creator-search",
+    "./skills/tiktok-creator-analysis",
+    "./skills/tiktok-batch-outreach"
+  ],
+
+  "expertType": "agent",
+  "agentName": "tiktok-creator-outreach",
+
+  "displayName": {
+    "en": "Kiky — TikTok Creator Outreach",
+    "zh": "Kiky — TikTok达人建联"
+  },
+  "profession": {
+    "en": "TikTok Creator Outreach Expert",
+    "zh": "TikTok达人建联专家"
+  },
+  "displayDescription": {
+    "en": "Find, analyze, and connect with TikTok creators at scale. Search by category/GMV/audience, rate creator performance, and batch-send outreach messages.",
+    "zh": "TikTok达人建联专家，支持达人搜索筛选、带货数据分析、批量会话建联。"
+  },
+  "avatar": "avatars/expert.png",
+  "categoryId": "07-SalesCommerce",
+  "defaultInitPrompt": {
+    "zh": "帮我搜索适合合作的TikTok达人，类目是美妆，GMV在1000-10000美元区间",
+    "en": "Search TikTok creators in the beauty category with GMV between $1,000-$10,000"
+  },
+  "plugin": "tiktok-creator-outreach",
+  "tags": [
+    { "en": "TikTok Shop", "zh": "TikTok电商" },
+    { "en": "Creator Outreach", "zh": "达人建联" },
+    { "en": "Affiliate Marketing", "zh": "联盟营销" }
+  ],
+  "quickPrompts": [
+    { "en": "Search TikTok creators in the beauty category with GMV between $1,000-$10,000", "zh": "帮我搜索适合合作的TikTok达人，类目是美妆，GMV在1000-10000美元区间" },
+    { "en": "Analyze the performance of these 10 creators and rank them", "zh": "分析这10个达人的带货表现，帮我打分排名" },
+    { "en": "Send outreach messages to these 50 creators with my collaboration template", "zh": "用我的建联话术模板，给这50个达人批量发送合作消息" }
+  ]
+}

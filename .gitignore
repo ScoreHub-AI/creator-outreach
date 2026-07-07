@@ -1,0 +1,5 @@
+.DS_Store
+avatars/*.png
+# 插件清单引用的头像需随包分发
+!avatars/expert.png
+.codebuddy-plugin/.created-by-session
