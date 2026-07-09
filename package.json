@@ -6,8 +6,12 @@
     ".codebuddy-plugin",
     "agents",
     "skills",
-    "avatars"
+    "avatars",
+    "install.js"
   ],
+  "bin": {
+    "creator-outreach": "./install.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ScoreHub-AI/creator-outreach.git"
