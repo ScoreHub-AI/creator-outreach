@@ -13,6 +13,16 @@
 
 ## 执行方式（MCP 优先）
 
+### 类目筛选前置步骤（重要）
+
+如果用户提到了品类/类目关键词（如"美妆"、"3C"、"beauty"、"electronics"），**必须**先调用 `get_categories` 获取类目 ID，再调用 `search_creators`：
+
+1. **`get_categories`** — 传入 `keyword`（品类名关键词），建议同时传 `category_version: "v2"` 和合适的 `locale`（中文用 `"zh-CN"`，英文用 `"en-US"`）
+2. 从返回的 `categories` 数组中，筛选出 `is_leaf: true` 的叶子节点
+3. 按 `parent_id` 分组叶子节点
+4. 构造 `category` 参数：`[{parent_category_id: "父ID", child_category_id_list: ["叶子ID1", "叶子ID2"]}]`
+5. 传给 `search_creators`
+
 调用 MCP 工具 **`search_creators`**，不要写脚本。若已授权可直接调用；未授权时先走 `authorize`。
 
 ### 入参
@@ -20,6 +30,7 @@
 | 参数 | 说明 |
 |------|------|
 | `keyword` | 用户名/昵称搜索（可选） |
+| `category` | 品类筛选数组（可选）。格式：`[{parent_category_id: "父ID", child_category_id_list: ["叶子ID1"]}]`。多个对象 OR 关系，单个对象内 child_category_id_list AND 关系。类目 ID **必须先通过 `get_categories` 获取**，不要硬编码或猜测。 |
 | `gmv_ranges` | GMV 区间数组，取值见下表（可选） |
 | `page_size` | 每页条数，默认/上限 20 |
 | `page_token` | 翻页令牌，首次不传，用上一页返回的 `next_page_token` 续拉 |
@@ -41,7 +52,7 @@ POST https://open-api.tiktokglobalshop.com/affiliate_seller/202508/marketplace_c
 ```
 
 - 签名：HMAC-SHA256，body 为空 `{}` 时不参与签名；compact JSON `separators=(",", ":")`
-- 已知类目 ID：`1000001`（Beauty & Personal Care）、`600024`（Beauty 子类目，最常见）
+- 类目 ID 应通过 `GET /product/202309/categories` 获取，不要硬编码。MCP 可用时用 `get_categories` 工具；降级时可参考已知 ID：`1000001`（Beauty & Personal Care）、`600024`（Beauty 子类目）
 
 ## 错误处理
 

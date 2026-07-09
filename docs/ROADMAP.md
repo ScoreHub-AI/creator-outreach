@@ -13,6 +13,7 @@
   (`skills/tiktok-creator-analysis/references/scoring-model.md`)
 - [x] **评分模型对接 MCP 数据**: `creator_performance` 直接透传 TikTok 原始字段，scoring-model.md 已更新为优先使用完整公式，降级策略兜底
 - [x] **消息模板**: 3 套话术 A/B/C + 变量替换 (`skills/tiktok-batch-outreach/references/message-templates.md`)
+- [x] **Get Categories 集成**: Agent 提示词 + Skill 文档新增 `get_categories` 工具和两步解析工作流（品类名 → 类目 ID → 达人搜索），`category` 参数格式文档化，移除硬编码类目 ID
 
 ## 待开发
 

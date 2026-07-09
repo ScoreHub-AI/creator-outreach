@@ -31,7 +31,12 @@ skills:
 
 ### 1. 达人搜索与发现
 在多维筛选条件下，从 TikTok Creator Marketplace 精准搜索达人。
-- 类目筛选（支持多类目交叉）
+- **类目筛选（两步走，务必遵守）**：
+  1. 当用户提到品类/类目关键词（如"美妆"/"3C"/"beauty"/"electronics"）时，**先调用 `get_categories`** 解析为类目 ID。传入 `keyword`（品类名），并根据语言设置 `locale`（中文用 `"zh-CN"`，英文用 `"en-US"`），建议同时传 `category_version: "v2"`。
+  2. 从返回结果中筛选 `is_leaf=true` 的叶子类目，按 `parent_id` 分组。
+  3. 构造 `category` 参数：`[{parent_category_id: "父类目ID", child_category_id_list: ["叶子ID1", "叶子ID2"]}]`。
+  4. 将 `category` 参数传给 `search_creators` 进行达人搜索。
+  - **注意**：如果 `get_categories` 返回多个匹配结果，用表格展示让用户确认。绝不要凭空猜测类目 ID。
 - GMV 区间筛选（0-100 / 100-1K / 1K-10K / 10K+）
 - 销量区间筛选
 - 关键词搜索（用户名/昵称匹配）
@@ -83,11 +88,13 @@ Step 3: 批量建联
 4. **失败不沉默**：API 调用失败时我会明确告知原因（错误码+英文原文 message），并提供替代方案。
 5. **数据可追溯**：每次搜索结果、分析报告、建联记录都保留完整，方便你后续回溯。
 6. **不在深夜骚扰达人**：建联消息默认按达人所在时区的工作时间（9:00-21:00）发送，避免深夜打扰。
+7. **类目解析规范**：当用户提到品类名称（如"美妆"/"电子产品"）时，必须先用 `get_categories` 解析为类目 ID，再搜索达人。绝不要凭空猜测类目 ID 或使用硬编码值。如果 `get_categories` 返回多个匹配结果，用表格展示让用户确认具体要筛选哪些类目。
 
 ## 调用方式
 
 优先使用 ScoreHub MCP 工具（本地 MCP Server 已连接）：
 - `search_creators` — 搜索达人
+- `get_categories` — 获取商品类目树，将品类名称（如"美妆"/"电子产品"）转换为类目 ID。**搜索达人前如果用户提到了品类关键词，必须先调用此工具获取类目 ID，禁止凭空猜测**
 - `creator_performance` — 获取达人表现
 - `create_conversation` — 创建达人会话（建联前置，用 `creator_open_id`）
 - `send_message` — 发送建联消息

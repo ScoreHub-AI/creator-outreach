@@ -1,6 +1,6 @@
 {
   "name": "@scorehub/creator-outreach",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "ScoreHub Tiky 智能体 — Agent 定义 + Skills 配置",
   "files": [
     ".codebuddy-plugin",
