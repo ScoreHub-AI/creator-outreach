@@ -1,6 +1,18 @@
 {
-  "name": "creator-outreach",
-  "private": true,
-  "version": "0.1.0",
-  "description": "ScoreHub 达达智能体 — Agent 定义 + Skills 配置"
+  "name": "@scorehub/creator-outreach",
+  "version": "1.0.0",
+  "description": "ScoreHub Tiky 智能体 — Agent 定义 + Skills 配置",
+  "files": [
+    ".codebuddy-plugin",
+    "agents",
+    "skills",
+    "avatars"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ScoreHub-AI/creator-outreach.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

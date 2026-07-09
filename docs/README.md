@@ -6,7 +6,7 @@
 
 TikTok Shop 卖家需要持续找达人合作带货。传统方式是在 TikTok Creator Marketplace 网页上手动搜索、一一点击达人主页看数据、逐个发私信——效率极低，且无法批量操作。
 
-「达达」是 ScoreHub 平台的首个 AI 智能体，目标是将达人建联流程从「手动点网页」升级为「对话式操作」。卖家在 WorkBuddy 中对达达说「帮我搜美妆类目、GMV 1000-10000 的达人，分析前 5 个的表现，然后群发建联消息」，达达自动完成整个流程。
+「Tiky」是 ScoreHub 平台的首个 AI 智能体，目标是将达人建联流程从「手动点网页」升级为「对话式操作」。卖家在 WorkBuddy 中对 Tiky 说「帮我搜美妆类目、GMV 1000-10000 的达人，分析前 5 个的表现，然后群发建联消息」，Tiky 自动完成整个流程。
 
 ## 功能说明
 
@@ -64,7 +64,7 @@ status               → 连接状态
 WorkBuddy (Agent Host)
     │
     ▼
-达达智能体 (creator-outreach)
+Tiky 智能体 (creator-outreach)
     │ MCP 协议
     ▼
 @scorehub/mcp-server (本地代理)
@@ -80,6 +80,6 @@ TikTok Shop Partner API
 
 智能体通过 WorkBuddy 专家市场发布。用户安装后，配置 ScoreHub MCP Server 即可使用。
 
-## 四个工程关系
+## 三个工程关系
 
 详见 [架构总览](../../../docs/ARCHITECTURE.md)

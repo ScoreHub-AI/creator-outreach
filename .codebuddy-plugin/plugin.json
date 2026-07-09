@@ -4,7 +4,7 @@
   "description": "TikTok Shop creator outreach specialist — search marketplace creators, analyze performance, and batch send collaboration messages.",
   "author": {
     "name": "Ben",
-    "email": "ben@scorehub.io"
+    "email": "bennyworks@foxmail.com"
   },
   "agents": ["./agents/tiktok-creator-outreach.md"],
   "skills": [
@@ -17,8 +17,8 @@
   "agentName": "tiktok-creator-outreach",
 
   "displayName": {
-    "en": "Kiky — TikTok Creator Outreach",
-    "zh": "Kiky — TikTok达人建联"
+    "en": "Tiky — TikTok Creator Outreach",
+    "zh": "Tiky — TikTok达人建联"
   },
   "profession": {
     "en": "TikTok Creator Outreach Expert",
