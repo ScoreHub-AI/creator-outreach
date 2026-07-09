@@ -14,7 +14,7 @@ npx @scorehub/creator-outreach
 
 自动完成：
 - 将 Tiky Agent 定义复制到 `~/.claude/agents/`
-- 将 ScoreHub MCP Server 配置写入 `~/.claude/settings.json`
+- 将 ScoreHub MCP Server 配置写入 `~/.claude.json`
 
 重启 Claude Code 后，通过 `@tiktok-creator-outreach` 唤起 Tiky。
 
