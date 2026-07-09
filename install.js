@@ -14,7 +14,7 @@ const AGENT_DEST = path.join(AGENTS_DIR, 'tiktok-creator-outreach.md');
 const MCP_CONFIG = {
   type: 'stdio',
   command: 'npx',
-  args: ['-y', '@scorehub/mcp-server'],
+  args: ['-y', '@scorehub/mcp-server@latest'],
   env: {
     SCOREHUB_REMOTE_MCP_URL: 'https://mcp.scorehub.cn',
   },

@@ -18,7 +18,7 @@
 
 ### 高优先级
 
-- [x] **评分模型对接 MCP 数据**: `creator_performance` 直接透传 TikTok 原始字段，scoring-model.md 已更新为优先使用完整公式，降级策略兜底
+（当前无高优先级待开发任务）
 
 ### 中优先级
 
