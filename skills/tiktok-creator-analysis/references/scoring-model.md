@@ -21,12 +21,14 @@
 ### 3. 粉丝规模（15%）
 - 维度分 = round(min(followers / maxFollowers × 100, 100))
 
-### 4. 品类匹配（20%，示例以美妆为基准）
-- 美妆类目 ID 集合：`{600024, 601303, 602118, 602284, 601450, 600025, 600026}`
-- 若有 `category_gmv_distribution`：取 GMV 占比最高的类目
-  - 该类目属美妆 → 维度分 = round(该类目 GMV 占比 × 100)
-  - 否则 → overlap = 交集类目数 / 达人类目数；维度分 = round(overlap × 80 + 10)
-- 若无分布数据 → 维度分 = round(overlap × 100)
+### 4. 品类匹配（20%）
+- **目标类目 ID 集合**（`target_cat_ids`）：由用户品类意图决定，通过 `get_categories` 获取后传入。**默认使用父类目 ID**；仅当用户明确指定某个子类目时，才改用该子类目 ID。示例（美妆父类目）：`{600024, 601303, 602118, 602284, 601450, 600025, 600026}`
+- 若有 `category_gmv_distribution`（API 返回的 `category_id` 为**顶级父类目 ID**，与 `target_cat_ids` 同层级）：
+  - 取 GMV 占比最高的类目，判断其 `category_id` 是否在 `target_cat_ids` 中
+    - **命中**（最理想路径）→ 维度分 = round(该类目 GMV 占比 × 100)，上限 100
+    - **未命中** → 计算分布中所有类目与 `target_cat_ids` 的交集：overlap = 交集类目数 / 分布中类目总数；维度分 = round(overlap × 100)
+- 若无 `category_gmv_distribution` → 维度分记 **null**（标注「品类数据未授权」），不参与品类维度排序
+  - **禁止用 `category_ids` 替代**：该字段是达人发帖产品的**叶子类目 ID**，层级远深于父类目，与 `target_cat_ids`（父类目）直接求交集结果恒为空，会错误地将匹配达人评为零分
 
 ### 5. 粉丝质量（10%，示例以美妆女性受众为基准）
 - 女性占比分 = min(female_pct × 100 / 0.8, 100)（female_pct 为小数，>1 时按 /100 归一）
@@ -47,28 +49,27 @@
 
 ## MCP 字段映射说明（重要）
 
-MCP 工具 `creator_performance` 直接透传 TikTok 详情接口的原始响应，**可直接使用上文完整公式**。
-字段对应关系如下：
+MCP 工具 `creator_performance` 直接透传 TikTok 详情接口的原始 JSON 响应（见官方 API 文档 `Get Marketplace Creator Performance`）。
+所有评分所需字段位于 `data.creator.*` 路径下，字段对应关系如下：
 
-| 评分所需（原始字段） | MCP `creator_performance` 返回字段 | 备注 |
-|----------------------|------------------------------------|------|
-| `gmv.amount`（字符串） | `gmv_30d`（数值） | 直接用 |
-| `units_sold` | `units_sold_30d` | 直接用 |
-| `avg_ec_live_view_count` | `avg_ec_live_view_count` | 直接用 |
-| `avg_ec_video_play_count` | `avg_ec_video_play_count` | 直接用 |
-| `ec_live_engagement_rate` | `ec_live_engagement_rate` | 直接用 |
-| `ec_video_engagement_rate` | `ec_video_engagement_rate` | 直接用 |
-| `follower_gender` | `follower_gender`（`[{key, value}]`） | 直接用，value 为小数占比 |
-| `follower_age` | `follower_age`（`[{key, value}]`） | 直接用，value 为小数占比 |
-| `category_gmv_distribution` | `category_gmv_distribution`（`[{category_id, value}]`） | 直接用 |
-| `category_ids` | `category_ids` | 直接用 |
+| 评分所需 | MCP 返回字段（`data.creator.*`） | 类型 | 使用方式 |
+|---------|------------------------------|------|---------|
+| GMV | `gmv.amount` | string（如 `"3434.23"`） | `parseFloat()` 后使用 |
+| 销量 | `units_sold` | int | 直接用 |
+| 直播观看 | `avg_ec_live_view_count` | int | 直接用 |
+| 视频播放 | `avg_ec_video_play_count` | int | 直接用 |
+| 直播互动率 | `ec_live_engagement_rate` | string（如 `"6000"` = 60%） | `parseFloat() / 100` 换算为百分比小数 |
+| 视频互动率 | `ec_video_engagement_rate` | string（如 `"3000"` = 30%） | `parseFloat() / 100` 换算为百分比小数 |
+| 粉丝性别 | `follower_gender[].key` / `.value` | key 为 string（`"Male"` / `"Female"`，首字母大写），value 为 string 小数（如 `"0.5000"`） | `parseFloat(value)` 后使用；key 比较需兼容大小写 |
+| 粉丝年龄 | `follower_age[].key` / `.value` | key 为 string（如 `"18-23"`），value 为 string 小数（如 `"0.2500"`） | `parseFloat(value)` 后使用 |
+| 品类 GMV 分布 | `category_gmv_distribution[].category_id` / `.value` | category_id 为 string（**顶级父类目 ID**），value 为 string 小数（如 `"0.3035"`） | `parseFloat(value)` 后作为 GMV 占比 |
+| 品类列表 | `category_ids` | string[]（**叶子类目 ID**） | **不用于品类匹配**（与父类目 ID 层级不同，交集恒为空） |
 
-**执行建议**：优先使用上表原始字段代入完整公式；若某原始字段缺失（接口未返回），
-按以下顺序降级：
-1. `avg_ec_live_view_count` / `avg_ec_video_play_count` 缺失 → 用 `avg_video_views` 合并近似观看量
-2. `ec_live/video_engagement_rate` 缺失 → 用 `engagement_rate`（单值）代入互动分
-3. `follower_gender` / `follower_age` 缺失 → 从 `follower_demographics` 取值
-4. `category_gmv_distribution` / `category_ids` 缺失 → 用 `top_categories` 的 share 计算占比/重叠
+**执行建议**：优先使用上表字段代入完整公式；若某字段缺失（接口未返回），对应子维度记 0 或 null 并**标注数据缺口**：
+- `avg_ec_live_view_count` 或 `avg_ec_video_play_count` 缺失 → 对应观看子分记 0，注明数据缺口
+- `ec_live_engagement_rate` 或 `ec_video_engagement_rate` 缺失 → 对应互动子分记 0，注明数据缺口
+- `follower_gender` 或 `follower_age` 缺失 → 对应粉丝质量子分记 0，注明数据缺口
+- `category_gmv_distribution` 缺失 → 品类匹配维度记 **null**（不参与排序），注明「品类数据未授权」
 
 字段缺失时对应维度**标注数据缺口**，不要静默填 0 造成排序失真。
 
@@ -107,24 +108,23 @@ def score_creator(c, all_creators):
     scores["followers"] = round(min((c.get("follower_count", 0) or 0) / max_followers * 100, 100))
 
     # 4. 品类匹配 (20%)
-    beauty_cat_ids = {"600024", "601303", "602118", "602284", "601450", "600025", "600026"}
-    categories = c.get("category_ids", [])
+    target_cat_ids = {"600024", "601303", "602118", "602284", "601450", "600025", "600026"}  # 应由 get_categories 获取，示例为美妆父类目
     cat_gmv_dist = c.get("category_gmv_distribution", [])
     if cat_gmv_dist:
         top_cat = max(cat_gmv_dist, key=lambda x: float(x.get("value", 0) or 0))
-        if top_cat.get("category_id", "") in beauty_cat_ids:
-            scores["category"] = round(float(top_cat.get("value", 0) or 0) * 100)
+        if top_cat.get("category_id", "") in target_cat_ids:
+            scores["category"] = round(min(float(top_cat.get("value", 0) or 0) * 100, 100))
         else:
-            overlap = len(set(categories) & beauty_cat_ids) / max(len(categories), 1)
-            scores["category"] = round(overlap * 80 + 10)
+            dist_ids = {x.get("category_id", "") for x in cat_gmv_dist}
+            overlap = len(dist_ids & target_cat_ids) / max(len(dist_ids), 1)
+            scores["category"] = round(overlap * 100)
     else:
-        overlap = len(set(categories) & beauty_cat_ids) / max(len(categories), 1)
-        scores["category"] = round(overlap * 100)
+        scores["category"] = None  # 品类数据未授权，不参与排序
 
     # 5. 粉丝质量 (10%)
     female_pct = 0
     for g in c.get("follower_gender", []):
-        if g.get("key") == "female":
+        if g.get("key", "").lower() == "female":
             female_pct = float(g.get("value", 0) or 0)
     q = min((female_pct if female_pct <= 1 else female_pct / 100) * 100 / 0.8, 100)
     core_age = sum(float(a.get("value", 0) or 0) for a in c.get("follower_age", [])
@@ -133,7 +133,7 @@ def score_creator(c, all_creators):
 
     scores["total"] = round(
         scores["sales"] * 0.30 + scores["content"] * 0.25 + scores["followers"] * 0.15
-        + scores["category"] * 0.20 + scores["follower_quality"] * 0.10
+        + (scores["category"] or 0) * 0.20 + scores["follower_quality"] * 0.10
     )
     return scores
 ```

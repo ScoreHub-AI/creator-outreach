@@ -15,6 +15,11 @@
 - [x] **消息模板**: 3 套话术 A/B/C + 变量替换 (`skills/tiktok-batch-outreach/references/message-templates.md`)
 - [x] **Get Categories 集成**: Agent 提示词 + Skill 文档新增 `get_categories` 工具和两步解析工作流（品类名 → 类目 ID → 达人搜索），`category` 参数格式文档化，移除硬编码类目 ID
 - [x] **类目过滤失效修正（bugfix）**: Agent + Skill 文档修正——核心是「达人搜索的 `category` 只认父类目 + 直接下一级子类目」这一版本无关的层级约束（禁用深层叶子），`category_version` 跟随区域（SEA/US/EU 用 v2），并新增"搜索后 `category_ids` 闭环校验"（零重叠即判定过滤静默失效、回退到父类目重搜），根治"中文类目树 ID 与搜索返回 category_ids 对不上"问题
+- [x] **MCP 生产域名迁移**: 安装脚本写入的默认 `SCOREHUB_REMOTE_MCP_URL` 切换到 `https://app.scorehub.cn/mcp`（2026-07-15）
+- [x] **店铺重新绑定提示**: 当 TikTok 店铺授权失效、撤销、过期或不匹配时，Agent/Skill/README 统一只用自然语言提示用户去 ScoreHub 重新绑定店铺，不展示错误码，也不误导用户重复执行本地 OAuth（2026-07-15）
+- [x] **限流场景禁止引导重新授权**: 当请求过于频繁、持续限流或配额受限时，Agent/Skill/README 统一只提示用户耐心等待、分批重试或缩小范围；不得建议“重新授权拿一个干净的 token”，也不得主动引导浏览器重新授权，除非用户自己明确要求（2026-07-15）
+- [x] **结构化错误类型驱动提示**: Agent/Skill 基于 `error_type` 而不是自然语言错误文本做分流：`oauth_invalid` 允许引导登录、`shop_auth_invalid` 提示重新绑定店铺、`rate_limited` / `quota_exhausted` 只提示等待、`invalid_input` 只提示修正请求（2026-07-15）
+- [x] **版本号升级与发布元数据同步**: 为本轮店铺重新绑定 / 限流提示 / 结构化错误提示修复提升对外包版本号，并同步发布元数据（2026-07-15）
 
 ## 待开发
 

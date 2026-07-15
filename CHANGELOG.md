@@ -1,5 +1,26 @@
 # @scorehub/creator-outreach
 
+## 1.0.13
+
+### Patch Changes
+
+- Stabilize OAuth and structured TikTok error handling so local OAuth invalidation, shop rebind prompts, parameter validation, and rate-limit guidance are distinguished consistently.
+
+## 1.0.12
+
+### Patch Changes
+
+- 将安装脚本写入的默认 MCP 远端地址从 `https://mcp.scorehub.cn` 切换到 `https://app.scorehub.cn/mcp`，匹配新的生产入口。
+
+## 1.0.11
+
+### Patch Changes
+
+- 修复评分模型字段对齐：mcp-remote `CreatorPerformance` 补 `data.creator` 嵌套层，修正 GMV/互动率/粉丝画像字段为真实 API 类型（string vs number）
+- 品类匹配改为父类目优先，移除 `category_ids`（叶子 ID）兜底，修复 gender key 大小写匹配
+- 补充 SEA 市场限制：泰/马/越/菲/印尼/新加坡，搜索前主动拦截不支持的市场
+- 新增类型验证脚本：真实 API 响应 fixture + `validate-types` 一键回归
+
 ## 1.0.10
 
 ### Patch Changes

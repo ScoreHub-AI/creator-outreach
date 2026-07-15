@@ -29,7 +29,7 @@ const MCP_CONFIG = {
   command: 'npx',
   args: ['-y', '@scorehub/mcp-server@latest'],
   env: {
-    SCOREHUB_REMOTE_MCP_URL: 'https://mcp.scorehub.cn',
+    SCOREHUB_REMOTE_MCP_URL: 'https://app.scorehub.cn/mcp',
   },
 };
 
