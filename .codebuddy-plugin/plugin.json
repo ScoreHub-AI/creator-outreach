@@ -1,7 +1,7 @@
 {
   "name": "tiktok-creator-outreach",
   "version": "1.1.3",
-  "description": "ScoreHub AI's TikTok Shop creator outreach assistant for finding, evaluating, and contacting creators across Southeast Asia.",
+  "description": "ScoreHub AI's TikTok creator marketing expert for building clear creator profiles and validating focused collaboration shortlists across Southeast Asia.",
   "author": {
     "name": "Ben",
     "email": "bennyworks@foxmail.com"
@@ -25,8 +25,8 @@
     "zh": "Tiky · TikTok达人营销专家"
   },
   "displayDescription": {
-    "en": "Tiky is ScoreHub AI's TikTok creator marketing agent, helping sellers discover suitable creators, evaluate collaboration potential, and scale outreach across Southeast Asia.",
-    "zh": "Tiky 是 ScoreHub AI 打造的 TikTok 达人营销智能体，帮助卖家在东南亚发现合适的达人、评估合作价值并高效推进建联。"
+    "en": "Tiky is ScoreHub AI's TikTok creator marketing expert, helping sellers build clear creator profiles, evaluate collaboration potential, and validate focused shortlists through targeted outreach.",
+    "zh": "Tiky 是 ScoreHub AI 打造的 TikTok 达人营销专家，帮助卖家建立清晰准确的达人画像、评估合作价值，并通过精选名单的小范围建联快速验证。"
   },
   "avatar": "avatars/scorehub-ai-white.png",
   "categoryId": "07-SalesCommerce",

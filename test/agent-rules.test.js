@@ -69,12 +69,18 @@ test('keeps the WorkBuddy plugin version aligned with the npm package', () => {
 });
 
 test('keeps ScoreHub AI as the master brand and Tiky as the named expert agent', () => {
-  const displayName = 'ScoreHub AI TikTok达人营销专家 · Tiky';
+  const displayName = 'ScoreHub AI TikTok达人营销专家';
+  const profession = 'Tiky · TikTok达人营销专家';
 
   assert.equal(pluginJson.displayName.zh, displayName);
-  assert.equal(pluginJson.profession.zh, 'TikTok达人营销专家');
-  assert.match(pluginJson.displayDescription.zh, /Tiky 是 ScoreHub AI 打造的 TikTok 达人营销智能体/);
+  assert.equal(pluginJson.profession.zh, profession);
+  assert.match(pluginJson.displayDescription.zh, /Tiky 是 ScoreHub AI 打造的 TikTok 达人营销专家/);
+  assert.match(pluginJson.displayDescription.zh, /建立清晰准确的达人画像/);
+  assert.match(pluginJson.displayDescription.zh, /小范围建联快速验证/);
   assert.match(agent, new RegExp(displayName.replace('·', '\\·')));
+  assert.match(agent, new RegExp(profession.replace('·', '\\·')));
   assert.match(agent, /我是 Tiky，ScoreHub AI 的 TikTok 达人营销专家/);
+  assert.match(agent, /不是海量群发工具/);
+  assert.match(agent, /不会把向成千上万位达人发消息作为交付目标/);
   assert.doesNotMatch(agent, /TikTok达人建联专家|Tiky by ScoreHub AI/);
 });

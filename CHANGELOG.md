@@ -1,5 +1,13 @@
 # @scorehub/creator-outreach
 
+## Unreleased
+
+### Changed
+
+- Reposition Tiky as a TikTok creator marketing expert focused on building clear creator profiles and validating focused collaboration shortlists, rather than a mass-messaging tool.
+- Require Tiky to redirect requests to contact thousands of creators toward discovery, profile analysis, ranking, and a focused outreach-validation shortlist.
+- Show Tiky in the conversation-facing profession field while keeping the plugin display name as the ScoreHub AI product name.
+
 ## 1.1.3
 
 ### Patch Changes

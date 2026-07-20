@@ -1,12 +1,12 @@
 # creator-outreach — 业务背景与功能说明
 
-> **实现状态**: 本文档描述目标功能全景。已实现：Agent 定义、插件清单、三个 Skill（MCP 优先调用）、评分模型/消息模板的口径文档、`create_conversation` 建联链路（sdk→mcp-remote→mcp-server）、账号与店铺切换，以及搜索和评分的固定 Markdown / WorkBuddy HTML 输出格式。仍在开发：配额预算提示、品牌关键词竞品搜索、相似达人推荐。当前不做：消息监听、A/B 回复率追踪、导出功能。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
+> **实现状态**: 本文档描述目标功能全景。已实现：Agent 定义、插件清单、三个 Skill（MCP 优先调用）、评分模型/消息模板的口径文档、`create_conversation` 建联链路（sdk→mcp-remote→mcp-server）、账号与店铺切换，以及搜索和评分的固定 Markdown / WorkBuddy HTML 输出格式。建联能力定位为针对精选候选人的小范围快速验证，不承诺向成千上万达人海量群发。仍在开发：配额预算提示、品牌关键词竞品搜索、相似达人推荐。当前不做：消息监听、A/B 回复率追踪、导出功能。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
 
 ## 业务背景
 
 TikTok Shop 卖家需要持续找达人合作带货。传统方式是在 TikTok Creator Marketplace 网页上手动搜索、一一点击达人主页看数据、逐个发私信——效率极低，且无法批量操作。
 
-「Tiky」是 ScoreHub AI 打造的 TikTok 达人营销智能体，以“ScoreHub AI TikTok达人营销专家 · Tiky”的身份在 WorkBuddy 发布。它帮助 TikTok Shop 卖家发现合适的达人、评估合作价值，并高效推进达人建联，将原本分散的筛选、分析与触达流程转化为对话式操作。卖家在 WorkBuddy 中对 Tiky 说「帮我搜美妆类目、GMV 1000-10000 的达人，分析前 5 个的表现，然后群发建联消息」，Tiky 即可按流程完成执行。
+「Tiky」是 ScoreHub AI 打造的 TikTok 达人营销专家，以“ScoreHub AI TikTok达人营销专家 · Tiky”的身份在 WorkBuddy 发布。她帮助 TikTok Shop 卖家发现合适的达人，将带货、内容、品类和受众数据整理成清晰可比较的达人画像，再对精选名单发起小范围建联，快速验证画像与合作假设。Tiky 不是面向成千上万达人的海量群发工具。卖家可以说「帮我搜美妆类目、GMV 1000-10000 的达人，分析前 5 位的画像，再联系最匹配的 3 位验证合作可能性」。
 
 ## 功能说明
 
@@ -63,8 +63,9 @@ TikTok Shop 卖家需要持续找达人合作带货。传统方式是在 TikTok 
 - 对昵称、用户名、标签和工具返回的其他文本做 HTML 转义，禁止将返回内容作为 HTML 或脚本执行。
 - 只有实际生成报告时才能声明存在 HTML 结果，不得虚构 `outputs` 等文件路径。
 
-### 批量建联
+### 小范围建联验证
 
+- **定位边界**：仅用于对经过画像评估的精选候选人进行小范围触达验证，不面向成千上万达人群发
 - **两步建联**：先创建会话（`create_conversation`，用 `creator_open_id`）拿 `conversation_id`，再发送消息（`send_message`）
 - 发送 5 种类型消息：文本（TEXT）、商品卡片（PRODUCT_CARD）、定向合作邀请（TARGET_COLLABORATION_CARD）、免费样品邀请（FREE_SAMPLE_CARD）、图片（IMAGE）
 - 消息模板变量替换（`{name}` / `{brand}` / `{commission}`，3 套模板轮换）
@@ -126,7 +127,7 @@ TikTok Shop Partner API
 
 智能体通过 WorkBuddy 专家市场以 ScoreHub AI 品牌发布。插件使用 ScoreHub AI 标识作为头像；用户安装后，配置 ScoreHub MCP Server 即可使用，TikTok 凭证由 ScoreHub 管理。
 
-每个新对话的首轮由 Agent 先介绍已稳定支持的达人搜索、表现分析和批量建联能力、支持的东南亚市场、典型用法和下一步选项；首轮不触发授权或 TikTok 操作。若当前对话中已有搜索结果，Agent 才可基于该结果提供分析、建联或重新搜索的后续建议。用户选择具体操作后，才进入既有的授权和执行流程。
+每个新对话的首轮由 Agent 先介绍已稳定支持的达人发现、画像评估和小范围建联验证能力，明确 Tiky 不是海量群发工具，并介绍支持的东南亚市场、典型用法和下一步选项；首轮不触发授权或 TikTok 操作。若当前对话中已有搜索结果，Agent 才可基于该结果提供分析、建联验证或重新搜索的后续建议。用户选择具体操作后，才进入既有的授权和执行流程。
 
 WorkBuddy 插件只提供“了解 Tiky 能做什么”的快捷入口，避免在新会话首轮发送会被能力介绍规则拦截的具体操作请求。
 
