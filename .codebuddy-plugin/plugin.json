@@ -1,48 +1,62 @@
 {
   "name": "tiktok-creator-outreach",
-  "version": "1.0.0",
-  "description": "TikTok Shop creator outreach specialist — search marketplace creators, analyze performance, and batch send collaboration messages.",
+  "version": "1.1.3",
+  "description": "ScoreHub AI's TikTok Shop creator outreach assistant for finding, evaluating, and contacting creators across Southeast Asia.",
   "author": {
     "name": "Ben",
     "email": "bennyworks@foxmail.com"
   },
-  "agents": ["./agents/tiktok-creator-outreach.md"],
+  "agents": [
+    "./agents/tiktok-creator-outreach.md"
+  ],
   "skills": [
     "./skills/tiktok-creator-search",
     "./skills/tiktok-creator-analysis",
     "./skills/tiktok-batch-outreach"
   ],
-
   "expertType": "agent",
   "agentName": "tiktok-creator-outreach",
-
   "displayName": {
-    "en": "Tiky — TikTok Creator Outreach",
-    "zh": "Tiky — TikTok达人建联"
+    "en": "ScoreHub AI TikTok Creator Marketing Expert",
+    "zh": "ScoreHub AI TikTok达人营销专家"
   },
   "profession": {
-    "en": "TikTok Creator Outreach Expert",
-    "zh": "TikTok达人建联专家"
+    "en": "Tiky · TikTok Creator Marketing Expert",
+    "zh": "Tiky · TikTok达人营销专家"
   },
   "displayDescription": {
-    "en": "Find, analyze, and connect with TikTok creators at scale. Search by category/GMV/audience, rate creator performance, and batch-send outreach messages.",
-    "zh": "TikTok达人建联专家，支持达人搜索筛选、带货数据分析、批量会话建联。"
+    "en": "Tiky is ScoreHub AI's TikTok creator marketing agent, helping sellers discover suitable creators, evaluate collaboration potential, and scale outreach across Southeast Asia.",
+    "zh": "Tiky 是 ScoreHub AI 打造的 TikTok 达人营销智能体，帮助卖家在东南亚发现合适的达人、评估合作价值并高效推进建联。"
   },
-  "avatar": "avatars/expert.png",
+  "avatar": "avatars/scorehub-ai-white.png",
   "categoryId": "07-SalesCommerce",
   "defaultInitPrompt": {
-    "zh": "帮我搜索适合合作的TikTok达人，类目是美妆，GMV在1000-10000美元区间",
-    "en": "Search TikTok creators in the beauty category with GMV between $1,000-$10,000"
+    "zh": "我想了解 Tiky 能帮我做什么",
+    "en": "What can Tiky help me do?"
   },
   "plugin": "tiktok-creator-outreach",
   "tags": [
-    { "en": "TikTok Shop", "zh": "TikTok电商" },
-    { "en": "Creator Outreach", "zh": "达人建联" },
-    { "en": "Affiliate Marketing", "zh": "联盟营销" }
+    {
+      "en": "ScoreHub AI",
+      "zh": "ScoreHub AI"
+    },
+    {
+      "en": "TikTok Shop",
+      "zh": "TikTok电商"
+    },
+    {
+      "en": "Creator Marketing",
+      "zh": "达人营销"
+    },
+    {
+      "en": "Southeast Asia",
+      "zh": "东南亚"
+    }
   ],
   "quickPrompts": [
-    { "en": "Search TikTok creators in the beauty category with GMV between $1,000-$10,000", "zh": "帮我搜索适合合作的TikTok达人，类目是美妆，GMV在1000-10000美元区间" },
-    { "en": "Analyze the performance of these 10 creators and rank them", "zh": "分析这10个达人的带货表现，帮我打分排名" },
-    { "en": "Send outreach messages to these 50 creators with my collaboration template", "zh": "用我的建联话术模板，给这50个达人批量发送合作消息" }
+    {
+      "en": "What can Tiky help me do?",
+      "zh": "我想了解 Tiky 能帮我做什么"
+    }
   ]
 }

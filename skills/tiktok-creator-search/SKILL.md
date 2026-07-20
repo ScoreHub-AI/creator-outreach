@@ -1,3 +1,8 @@
+---
+name: tiktok-creator-search
+description: 在 TikTok Shop Creator Marketplace 中按关键词、类目、GMV 和市场条件搜索达人，并以固定 Markdown 或 WorkBuddy HTML 格式展示结果。用于搜索、查找、筛选 TikTok 达人或继续翻页的请求。
+---
+
 # TikTok Creator Search — 达人搜索
 
 在 TikTok Shop Creator Marketplace 中按多维度筛选搜索达人，支持翻页获取全量结果。
@@ -33,6 +38,8 @@
 
 调用 MCP 工具 **`search_creators`**，不要写脚本。若已授权可直接调用；未授权时先走 `authorize`。
 
+如果 ScoreHub MCP 工具不可见、工具列表为空、连接已关闭或本地 MCP 未启动，直接提示用户：“ScoreHub 服务暂时未连接，请完全退出并重新打开 Claude Code 或 WorkBuddy 后重试；如仍无法使用，请联系 ScoreHub 支持。”不要向终端用户提及 Node.js、npm、网络、环境变量、TikTok API 凭证或直连 API，也不要调用 `authorize`。
+
 如果工具返回结构化 JSON，优先按 `error_type` 做分流，不要靠自然语言错误文本猜测。
 
 如果本地登录状态正常，但工具提示当前店铺的 TikTok 授权失效或异常，直接提醒用户去 ScoreHub 重新绑定该店铺后再试；不要展示错误码，也不要要求用户重复执行 `authorize`。
@@ -51,11 +58,34 @@
 
 **GMV 区间取值**：`GMV_RANGE_0_100` / `GMV_RANGE_100_1000` / `GMV_RANGE_1000_10000` / `GMV_RANGE_10000_AND_ABOVE`
 
-### 输出与后续
+### 输出与后续（固定格式）
 
-- 结果用**表格**展示关键字段（昵称 / 用户名 / 粉丝数 / GMV 区间 / 类目），避免大段 JSON。
-- **务必透传每个达人的 `creator_open_id`**——这是后续 `create_conversation` 建联的必需字段，且**仅搜索结果返回**（分析接口不返回）。
-- 单页最多 20 条，大批量搜索需用 `page_token` 多次翻页。
+禁止直接展示 MCP 原始 JSON。每次成功搜索都按以下顺序输出：
+
+1. **结果摘要**：实际返回数、`total_count`、用户可读的搜索条件、当前排序、是否还有下一页。
+2. **达人列表**：固定展示“排名 / 昵称 / 用户名 / 粉丝数 / 近 30 天 GMV 区间 / 类目匹配 / 标识”。
+3. **分页状态**：使用“已显示 X / 共 Y；还有更多结果，可继续获取下一页”或“已显示全部结果”。不要向用户展示 `page_token`。
+4. **下一步**：只建议分析选中达人、继续翻页或调整条件，不要擅自开始批量分析或建联。
+
+格式化规则：
+
+- 默认保持 `search_creators` 返回顺序并以此编号；只有用户明确要求按某字段排序时才调整，并在摘要说明排序依据。
+- 粉丝数使用千位分隔；GMV 区间转换为用户可读值（`0–100` / `100–1K` / `1K–10K` / `10K+`）；缺失字段统一显示 `—`，不要猜测。
+- 类目匹配在使用类目筛选并完成闭环校验后显示“命中”；没有类目筛选时显示“未校验”；过滤疑似失效时不要展示为合格结果。
+- 必须为每位达人保留 `creator_user_id` 和 `creator_open_id` 的一一映射：前者供 `creator_performance` 使用，后者供 `create_conversation` 使用。不得混用、截断、改写或从其他字段推断。
+- Markdown 的“标识”列弱化展示“分析 ID / 建联 ID”；HTML 将两个 ID 放在可展开详情和复制区域，不占主表视觉焦点。
+- `creator_open_id` 缺失时显示“建联 ID 不可用”，并明确该达人暂不可建联；`creator_user_id` 缺失时显示“分析 ID 不可用”，不得调用表现分析。
+- 结果为空时不生成空表。固定输出“未找到符合条件的达人”，复述本次条件，并建议放宽类目、GMV 或关键词。
+- 单页最多 20 条，大批量搜索需用 `page_token` 多次翻页，但内部令牌永不对外展示。
+
+### WorkBuddy HTML 可视化
+
+- 结果为 1–5 条时使用 Markdown 表格；达到 **6 条**时，若当前宿主提供 HTML/可视化产物能力，默认生成自包含的响应式 HTML 报告。用户明确要求 HTML 时不受条数限制。
+- 宿主不支持 HTML，或 HTML 生成失败时，必须回退为包含全部记录的 Markdown，不能只给摘要或丢失达人。
+- HTML 搜索报告必须包含：搜索条件摘要、返回数/总数/分页状态、可搜索和排序的达人表格、达人详情、双 ID 复制区域和下一步建议。
+- 只使用内联 CSS/JavaScript，不依赖 CDN、远程字体或外部图片；只实现真实可用的搜索、排序、展开和复制交互，不添加无法触发 Agent 或 MCP 操作的伪按钮。
+- 昵称、用户名及所有工具返回文本写入 HTML 前必须转义；禁止把工具内容作为 HTML 或脚本执行。
+- 生成 HTML 后仍需在对话中给出结果数量、排序和分页的简短摘要。只有实际生成产物时才可声明存在 HTML，不得虚构文件名或 `outputs` 路径。
 
 ### 类目过滤闭环校验（防静默失效）
 
@@ -65,17 +95,6 @@
   1. 提示用户"当前类目过滤可能未生效"；
   2. 回退到更浅的类目层级重搜：把所传的深层子类目换成其**父类目**（只传 `parent_category_id`）重新 `search_creators`；仍零重叠时再上溯一级到顶级父类目。
 - 若有重叠，说明过滤生效，正常展示。
-
-## 降级：直接 API
-
-MCP 不可用时，降级用环境变量凭证直接调用：
-
-```
-POST https://open-api.tiktokglobalshop.com/affiliate_seller/202508/marketplace_creators/search
-```
-
-- 签名：HMAC-SHA256，body 为空 `{}` 时不参与签名；compact JSON `separators=(",", ":")`
-- 类目 ID 应通过 `GET /product/202309/categories` 获取，不要硬编码。MCP 可用时用 `get_categories` 工具。注意达人搜索的 `category` 只认「父类目 + 直接下一级子类目」，深层叶子无效；已知父类目段 ID 形如 `600001`（6 位），可作层级参考。
 
 ## 市场限制
 
@@ -96,6 +115,7 @@ POST https://open-api.tiktokglobalshop.com/affiliate_seller/202508/marketplace_c
 
 | 问题类型 | 处理 |
 |----------|------|
+| MCP 工具不可见、工具列表为空、连接关闭或本地 MCP 未启动 | 提示“ScoreHub 服务暂时未连接，请完全退出并重新打开客户端后重试；如仍无法使用，请联系 ScoreHub 支持。”不提及技术配置，不走 `authorize` |
 | `oauth_invalid` | 仅在真正未授权或本地 OAuth 失效时，才允许提示用户调用 `authorize` |
 | 当前店铺的 TikTok 授权失效或异常 | 用中文提醒用户：本地登录状态正常，但当前店铺需要先到 ScoreHub 重新绑定后再试；不要展示错误码，不要要求重复 `authorize` |
 | 日配额已用完 | 明确告知用户，停止 |

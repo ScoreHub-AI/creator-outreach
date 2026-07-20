@@ -2,4 +2,6 @@
 avatars/*.png
 # 插件清单引用的头像需随包分发
 !avatars/expert.png
+!avatars/scorehub-ai.png
+!avatars/scorehub-ai-white.png
 .codebuddy-plugin/.created-by-session

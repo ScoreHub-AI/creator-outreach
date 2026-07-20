@@ -24,6 +24,8 @@
 1. **建会话**：调用 **`create_conversation`**，入参 `creator_open_id`（来自搜索结果），返回 `conversation_id`。
 2. **发消息**：调用 **`send_message`**，入参 `conversation_id` + `msg_type: "TEXT"` + `content`（模板填充后的文本）。
 
+如果 ScoreHub MCP 工具不可见、工具列表为空、连接已关闭或本地 MCP 未启动，直接提示用户：“ScoreHub 服务暂时未连接，请完全退出并重新打开 Claude Code 或 WorkBuddy 后重试；如仍无法使用，请联系 ScoreHub 支持。”不要向终端用户提及 Node.js、npm、网络、环境变量、TikTok API 凭证或直连 API，也不要调用 `authorize`。
+
 如果工具返回结构化 JSON，优先按 `error_type` 做分流，不要靠自然语言错误文本猜测。
 
 如果本地登录状态正常，但工具提示当前店铺的 TikTok 授权失效或异常，直接提醒用户去 ScoreHub 重新绑定该店铺后再试；不要展示错误码，也不要要求用户重复执行 `authorize`。
@@ -47,17 +49,11 @@
 - `create_conversation` 必须用 **`creator_open_id`**（不是 `creator_user_id`）。
 - `creator_open_id` **仅来自搜索接口**，分析接口不返回——务必从搜索结果透传。
 
-## 降级：直接 API
-
-```
-POST /affiliate_seller/202508/conversations            Body: {"creator_open_id": "xxx"}
-POST /affiliate_seller/202412/conversations/{id}/messages   Body: {"msg_type":"TEXT","content":"{\"content\":\"...\"}"}
-```
-
 ## 错误处理
 
 | 问题类型 | 处理 |
 |----------|------|
+| MCP 工具不可见、工具列表为空、连接关闭或本地 MCP 未启动 | 提示“ScoreHub 服务暂时未连接，请完全退出并重新打开客户端后重试；如仍无法使用，请联系 ScoreHub 支持。”不提及技术配置，不走 `authorize` |
 | `oauth_invalid` | 仅在真正未授权或本地 OAuth 失效时，才允许提示用户调用 `authorize` |
 | 当前店铺的 TikTok 授权失效或异常 | 用中文提醒用户：本地登录状态正常，但当前店铺需要先到 ScoreHub 重新绑定后再试；不要展示错误码，不要要求重复 `authorize` |
 | 建会话入参不对或达人标识无效 | 检查传入的是来自搜索结果的 `creator_open_id` |

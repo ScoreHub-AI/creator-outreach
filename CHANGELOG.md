@@ -1,5 +1,53 @@
 # @scorehub/creator-outreach
 
+## 1.1.3
+
+### Patch Changes
+
+- Constrain creator search and scoring responses to stable summaries, tables, pagination, identifier retention, missing-data handling, and deterministic ranking rules.
+- Generate self-contained WorkBuddy HTML reports for six or more results when visualization is available, with complete Markdown fallback.
+- Avoid misleading relative scores for a single creator and preserve outreach identifiers from search context for later actions.
+
+## 1.1.2
+
+### Patch Changes
+
+- Confirm the current login phone number before the authorized shop, country, and brands after authorization succeeds.
+
+## 1.1.1
+
+### Patch Changes
+
+- Require Tiky to confirm the authorized shop name, country, and bound brands after authorization or a shop switch succeeds.
+
+## 1.1.0
+
+### Minor Changes
+
+- Recognize account and shop switching requests, including immediate handling on the first turn for session preparation.
+
+## 1.0.16
+
+### Patch Changes
+
+- Use an opaque white WorkBuddy avatar background so transparent pixels no longer render as dark.
+
+## 1.0.15
+
+### Patch Changes
+
+- Remove the unsupported direct TikTok API fallback from user-facing agent guidance. WorkBuddy users now receive a simple MCP recovery prompt, while ScoreHub manages TikTok credentials.
+- Introduce Tiky's supported capabilities at the start of every new conversation before requesting authorization or running an operation.
+- Expand the first-conversation introduction with supported markets, practical examples, and context-aware next-step guidance.
+- Refresh the WorkBuddy plugin profile with ScoreHub AI branding, a branded avatar, and first-use-aligned prompts.
+- Keep the WorkBuddy quick entry focused on Tiky's capability introduction so it does not conflict with first-conversation behavior.
+
+## 1.0.14
+
+### Patch Changes
+
+- Clarify the supported client setup, add bilingual npm documentation, and validate Node.js and installed clients before writing configuration files.
+
 ## 1.0.13
 
 ### Patch Changes

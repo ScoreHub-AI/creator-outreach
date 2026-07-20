@@ -1,14 +1,21 @@
 {
   "name": "@scorehub/creator-outreach",
-  "version": "1.0.13",
-  "description": "ScoreHub Tiky 智能体 — Agent 定义 + Skills 配置",
+  "version": "1.1.3",
+  "description": "ScoreHub AI TikTok达人营销专家 Tiky — Agent 定义 + Skills 配置",
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     ".codebuddy-plugin",
     "agents",
     "skills",
     "avatars",
-    "install.js"
+    "install.js",
+    "README.en.md"
   ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
   "bin": {
     "creator-outreach": "./install.js"
   },
