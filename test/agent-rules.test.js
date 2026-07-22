@@ -263,6 +263,8 @@ test('constrains creator scoring results and avoids misleading single-creator sc
   assert.match(analysisSkill, /不输出综合分或五维相对分/);
   assert.match(analysisSkill, /至少需要 2 位候选人才可评分排名/);
   assert.match(analysisSkill, /排名 \/ 达人 \/ 综合分 \/ 带货能力 \/ 内容影响力 \/ 粉丝规模 \/ 品类匹配 \/ 粉丝质量 \/ 标签/);
+  assert.match(analysisSkill, /标签 \/ 推荐结论 \/ 推荐理由/);
+  assert.match(analysisSkill, /两条推荐依据、主要风险、建议动作/);
   assert.match(analysisSkill, /综合分降序.*带货能力分.*内容影响力分.*粉丝数降序/);
   assert.match(analysisSkill, /失败值作为 0 分参与排序/);
   assert.match(analysisSkill, /入参名保留为 `creator_user_id`，其值必须直接使用搜索结果中的 `creator_open_id`/);
@@ -272,12 +274,25 @@ test('constrains creator scoring results and avoids misleading single-creator sc
   assert.doesNotMatch(analysisSkill, /\| 带货能力 \| 30% \|/);
 
   assert.match(scoringModel, /综合评分 = 带货能力×30%.*粉丝质量×10%/);
+  assert.match(scoringModel, /推荐结论解释的是\*\*当前候选集内的合作优先级\*\*/);
+  assert.match(scoringModel, /`p = \(rank - 1\) \/ \(n - 1\)`/);
+  assert.match(scoringModel, /`p <= 0\.30`.*优先推荐/s);
+  assert.match(scoringModel, /`0\.30 < p <= 0\.70`.*值得测试/s);
+  assert.match(scoringModel, /`p > 0\.70`.*谨慎考虑/s);
+  assert.match(scoringModel, /明确不匹配 → 本轮不推荐/);
+  assert.match(scoringModel, /核心数据缺失 → 谨慎考虑/);
+  assert.match(scoringModel, /推荐结论.*推荐依据.*主要风险.*建议动作/s);
+  assert.match(scoringModel, /暂不推荐.*信息不足，暂缓推荐.*值得进一步验证.*需加入更多候选后判断优先级/s);
   assert.match(scoringModel, /## MCP 字段映射说明/);
   assert.match(scoringModel, /## 参考实现（Python）/);
   assert.match(scoringModel, /`score_creator\(\)` 仅用于帮助理解/);
   assert.match(scoringModel, /不是独立权威口径/);
   assert.match(scoringModel, /以上文正文中的明文规则为准/);
   assert.match(scoringModel, /def score_creator\(c, all_creators, target_cat_ids\):/);
+
+  for (const summary of [agent, docsReadme, packageReadme, packageReadmeEn]) {
+    assert.doesNotMatch(summary, /p = \(rank - 1\)|p <= 0\.30|0\.30 < p <= 0\.70|60 个中文字符/);
+  }
 });
 
 test('keeps outreach-specific confirmation and delivery rules in the outreach skill', () => {

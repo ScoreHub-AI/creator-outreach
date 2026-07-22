@@ -1,6 +1,10 @@
 # @scorehub/creator-outreach
 
-## Unreleased
+## 1.3.3
+
+### Changed
+
+- Add target-aware recommendation verdicts, concise leaderboard reasons, and evidence-backed detail analysis to creator scoring reports while preserving non-relative single-creator judgments.
 
 ## 1.3.2
 
