@@ -22,7 +22,7 @@
 - 维度分 = round(min(followers / maxFollowers × 100, 100))
 
 ### 4. 品类匹配（20%）
-- **目标类目 ID 集合**（`target_cat_ids`）：由用户品类意图决定，通过 `get_categories` 获取后传入。**默认使用父类目 ID**；仅当用户明确指定某个子类目时，才改用该子类目 ID。示例（美妆父类目）：`{600024, 601303, 602118, 602284, 601450, 600025, 600026}`
+- **目标类目 ID 集合**（`target_cat_ids`）：由用户品类意图决定，只能使用本轮当前授权店铺的 `get_categories` 结果。默认使用 `parent_id == "0"` 的顶层类目 ID；仅当用户明确指定某个直接子类目时，才改用该子类目 ID。不得硬编码、跨店铺复用或合并多个市场的类目 ID。
 - 若有 `category_gmv_distribution`（API 返回的 `category_id` 为**顶级父类目 ID**，与 `target_cat_ids` 同层级）：
   - 取 GMV 占比最高的类目，判断其 `category_id` 是否在 `target_cat_ids` 中
     - **命中**（最理想路径）→ 维度分 = round(该类目 GMV 占比 × 100)，上限 100
@@ -78,7 +78,7 @@ MCP 工具 `creator_performance` 直接透传 TikTok 详情接口的原始 JSON 
 以下 `score_creator()` 仅用于帮助理解上文规则，不是独立权威口径，也不是项目运行代码。如果示例与上文公式、字段映射或缺失值规则冲突，以上文正文中的明文规则为准。
 
 ```python
-def score_creator(c, all_creators):
+def score_creator(c, all_creators, target_cat_ids):
     scores = {}
     max_gmv = max(float(x.get("gmv", {}).get("amount", 0) or 0) for x in all_creators) + 1
     max_followers = max(x.get("follower_count", 0) or 0 for x in all_creators) + 1
@@ -108,7 +108,6 @@ def score_creator(c, all_creators):
     scores["followers"] = round(min((c.get("follower_count", 0) or 0) / max_followers * 100, 100))
 
     # 4. 品类匹配 (20%)
-    target_cat_ids = {"600024", "601303", "602118", "602284", "601450", "600025", "600026"}  # 应由 get_categories 获取，示例为美妆父类目
     cat_gmv_dist = c.get("category_gmv_distribution", [])
     if cat_gmv_dist:
         top_cat = max(cat_gmv_dist, key=lambda x: float(x.get("value", 0) or 0))

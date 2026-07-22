@@ -58,7 +58,7 @@ Ask Tiky:
 - Find TikTok creators in the beauty category with GMV between $1,000 and $10,000.
 - Find 20 beauty creators with 10K-100K followers, at least 60% female followers aged 18-34, GMV of $1K+, 5K+ average shoppable-video views, independent status, and fast growth.
 - Analyze the sales performance of these 10 creators and rank them.
-- From the top five, select the three best-matched creators and contact them using my approved message to validate the profile.
+- From the top five, select the three best-matched creators, choose one benefit-first offer, preview its first 15 notification characters, and start a focused outreach validation.
 
 ## Troubleshooting
 

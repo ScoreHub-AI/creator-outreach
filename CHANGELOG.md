@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 1.3.2
+
+### Changed
+
+- Add editable, single-offer outreach presets that place the strongest benefit first and show the first 15 notification characters before the user confirms the final message.
+
+### Fixed
+
+- Resolve creator categories from the current SEA shop's v2 category tree and local language, reject cross-region creator results, and remove cross-market static category IDs from scoring guidance.
+
+## 1.3.1
+
+### Fixed
+
+- Default creator category searches to true top-level categories (`parent_id == "0"`), and only narrow to a direct child category when the user explicitly requests that subcategory.
+
 ## 1.3.0
 
 ### Minor Changes

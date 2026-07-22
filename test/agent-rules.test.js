@@ -146,6 +146,9 @@ test('constrains creator search results to the stable presentation contract', ()
   assert.match(searchSkill, /未识别类目（N）/);
   assert.match(searchSkill, /不得展示 `category_details\[\]\.id` 或 `category_ids`/);
   assert.match(searchSkill, /闭环校验继续使用原始 `category_ids`/);
+  assert.match(searchSkill, /`selection_region`.*当前授权店铺市场代码/);
+  assert.match(searchSkill, /不匹配的达人不得作为合格结果展示.*不得进入分析或建联/);
+  assert.match(searchSkill, /`selection_region` 缺失.*地区未校验/);
 });
 
 test('keeps internal search parameters private and caps a search session at 60 creators', () => {
@@ -188,6 +191,26 @@ test('only asks for category confirmation when multiple matches remain ambiguous
   assert.match(searchSkill, /无法.*用户原话判定/);
   assert.match(searchSkill, /唯一明确匹配时直接/);
   assert.match(agent, /类目解析.*遵循 `tiktok-creator-search` Skill/);
+});
+
+test('defaults creator searches to top-level categories and gates child categories on explicit intent', () => {
+  assert.match(searchSkill, /SEA 店铺.*`category_version: "v2"`.*不传 `locale`/);
+  assert.match(searchSkill, /宽泛品类.*首次不传 `keyword`.*顶层类目/);
+  assert.match(searchSkill, /只有用户明确指定具体子类目时.*店铺当地语言关键词/);
+  assert.doesNotMatch(searchSkill, /zh-CN|category_locale/);
+  assert.match(searchSkill, /只有 `parent_id == "0"` 的类目才是.*顶层类目/);
+  assert.match(searchSkill, /`is_leaf=false`.*不能据此把中间层当作顶层/);
+  assert.match(searchSkill, /用户只表达宽泛品类.*只使用 `parent_id == "0"` 的顶层类目/);
+  assert.match(searchSkill, /只有用户原话明确点名具体子类目时，才允许传 `child_category_id_list`/);
+  assert.match(searchSkill, /仅因关键词查询返回子类目.*不视为用户明确指定子类目/);
+  assert.match(searchSkill, /无法从工具结果可靠完成映射时，回退为只传顶层类目/);
+  assert.doesNotMatch(searchSkill, /兜底匹配子类目/);
+  assert.doesNotMatch(searchSkill, /仅当没有合适父类目时降级/);
+  assert.match(scoringModel, /默认使用 `parent_id == "0"` 的顶层类目 ID/);
+  assert.match(scoringModel, /仅当用户明确指定某个直接子类目时/);
+  assert.match(scoringModel, /只能使用本轮当前授权店铺的 `get_categories` 结果/);
+  assert.match(scoringModel, /不得硬编码、跨店铺复用或合并多个市场的类目 ID/);
+  assert.doesNotMatch(scoringModel, /600024|601303|602118|602284|601450|600025|600026/);
 });
 
 test('uses WorkBuddy AskUserQuestion for ambiguous creator search filters', () => {
@@ -254,33 +277,67 @@ test('constrains creator scoring results and avoids misleading single-creator sc
   assert.match(scoringModel, /`score_creator\(\)` 仅用于帮助理解/);
   assert.match(scoringModel, /不是独立权威口径/);
   assert.match(scoringModel, /以上文正文中的明文规则为准/);
-  assert.match(scoringModel, /def score_creator\(c, all_creators\):/);
+  assert.match(scoringModel, /def score_creator\(c, all_creators, target_cat_ids\):/);
 });
 
 test('keeps outreach-specific confirmation and delivery rules in the outreach skill', () => {
+  assert.match(outreachSkill, /^---\nname: tiktok-batch-outreach\ndescription: .*TikTok 达人.*利益前置合作话术/);
   assert.match(outreachSkill, /小范围达人建联验证专项行为的权威来源/);
   assert.match(outreachSkill, /发送前\*\*必须\*\*与用户确认/);
   assert.match(outreachSkill, /品牌名/);
-  assert.match(outreachSkill, /佣金比例/);
+  assert.match(outreachSkill, /精选达人名单/);
+  assert.match(outreachSkill, /整批单选的 Offer 类型及其实际金额 \/ 比例/);
+  assert.match(outreachSkill, /通知栏前 15 字预览与所有将轮换的完整最终话术/);
+  assert.match(outreachSkill, /`AskUserQuestion`/);
+  assert.match(outreachSkill, /`multiSelect: false`/);
+  assert.match(outreachSkill, /每个选项的描述直接展示默认前缀和前 15 字预览/);
+  assert.match(outreachSkill, /同一批达人只能选择一种 Offer/);
+  assert.match(outreachSkill, /取消、空选择或自定义值存在歧义时，不调用 `create_conversation` 或 `send_message`/);
+  assert.match(outreachSkill, /用户明确提供完整最终文案时不静默改写/);
   assert.match(outreachSkill, /`create_conversation`/);
   assert.match(outreachSkill, /`send_message`/);
   assert.match(outreachSkill, /5-8 秒 \+ 随机抖动/);
-  assert.match(outreachSkill, /话术正文、轮换规则和变量定义的唯一权威来源/);
+  assert.match(outreachSkill, /Offer 预设、通知栏前 15 字规则、话术正文、轮换规则和变量定义的唯一权威来源/);
   assert.doesNotMatch(outreachSkill, /3 套模板 A\/B\/C/);
+  assert.doesNotMatch(outreachSkill, /\$200 Cash|35% Comm|Exclusive 50%/);
   assert.match(outreachSkill, /`creator_open_id` \*\*仅来自搜索接口\*\*/);
 
-  assert.match(messageTemplates, /3 套英文模板轮换发送/);
-  assert.match(messageTemplates, /`\{name\}` 达人昵称、`\{brand\}` 品牌名、`\{commission\}` 佣金比例/);
+  assert.match(messageTemplates, /3 套正文按发送序号取模（`i % 3`）轮换/);
+  assert.match(messageTemplates, /`\{offer_prefix\}`/);
+  assert.match(messageTemplates, /`\{name\}`/);
+  assert.match(messageTemplates, /`\{brand\}`/);
+  assert.match(messageTemplates, /`\{cash\}`/);
+  assert.match(messageTemplates, /`\{commission\}` \/ `\{discount\}`/);
   assert.match(messageTemplates, /## Template A/);
   assert.match(messageTemplates, /## Template B/);
   assert.match(messageTemplates, /## Template C/);
-  assert.match(messageTemplates, /发送前确认行为由建联 Skill 统一规定/);
+  assert.match(messageTemplates, /发送前的选择、确认与自定义话术行为由建联 Skill 统一规定/);
+  assert.match(messageTemplates, /系统生成或改写的话术必须从 `\{offer_prefix\}` 开始/);
+  assert.match(messageTemplates, /现金型的完整 `\{cash\}`.*必须完整出现在前 15 个字符内/);
+
+  for (const heading of ['## Template A', '## Template B', '## Template C']) {
+    assert.match(getMarkdownSection(messageTemplates, heading), /```\n\{offer_prefix\}/);
+  }
+
+  const offerPreviews = [
+    ['【$200 Cash + 30% Comm】', '【$200 Cash + 30'],
+    ['【35% Comm + Free Sample】', '【35% Comm + Fre'],
+    ['【Exclusive 50% Off Code + Free Sample】', '【Exclusive 50% '],
+  ];
+  for (const [offer, preview] of offerPreviews) {
+    assert.match(messageTemplates, new RegExp(offer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+    assert.equal(Array.from(offer).slice(0, 15).join(''), preview);
+  }
 });
 
 test('keeps analysis and outreach implementation details out of the agent', () => {
   assert.match(agent, /评分模型.*遵循 `tiktok-creator-analysis` Skill/);
   assert.match(agent, /发送前确认.*遵循 `tiktok-batch-outreach` Skill/);
+  assert.match(agent, /利益前置 Offer 预设.*通知栏前 15 字预览/);
   assert.doesNotMatch(agent, /带货能力30%/);
+  for (const summary of [agent, docsReadme, packageReadme, packageReadmeEn]) {
+    assert.doesNotMatch(summary, /\$200 Cash|35% Comm|Exclusive 50%|\{offer_prefix\}/);
+  }
   assert.doesNotMatch(agent, /PRODUCT_CARD/);
   assert.doesNotMatch(agent, /TARGET_COLLABORATION_CARD/);
   assert.doesNotMatch(agent, /FREE_SAMPLE_CARD/);
