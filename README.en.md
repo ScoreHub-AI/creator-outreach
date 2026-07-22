@@ -6,39 +6,46 @@ Chinese version: [README.md](./README.md)
 
 ## Supported Clients
 
-- Claude Code
 - WorkBuddy
-
-Claude Desktop is not currently supported by this installer.
 
 ## Install
 
-### Prerequisites
+### Public Entry for End Users
 
-- Node.js 18 or later
-- npm and network access to the npm registry
-- Claude Code or WorkBuddy installed and launched at least once
+For the public release, end users only need to:
 
-Run:
+1. Install WorkBuddy and launch it at least once
+2. Open the following share link in a browser so it can launch WorkBuddy and install Tiky:
+
+   `https://www.workbuddy.cn/work/launch/?sharecode=lNM8H05BRKoV-dw2gac3ZwQ-p01o3C3KVz1gXJ_CwvtX02-mSRqBB3xepE4V0gr7&expertname=Tiky+%C2%B7+TikTok%E8%BE%BE%E4%BA%BA%E8%90%A5%E9%94%80%E4%B8%93%E5%AE%B6&buddy_type=workbuddy`
+
+3. Return to WorkBuddy and open the “Tiky · TikTok Creator Marketing Expert” conversation
+
+Tiky uses `npx -y @scorehub/creator-outreach@latest` to run a bootstrap check before every new conversation. When the machine is uninitialized, Tiky explains that the ScoreHub local component is required and waits for explicit confirmation. It then prefetches and self-checks `@scorehub/mcp-server@latest` before updating Tiky's files and the WorkBuddy `scorehub` MCP configuration. WorkBuddy must be fully restarted after the initial installation.
+
+That first confirmation also authorizes future silent creator-outreach updates, so Tiky does not ask again for every release. The MCP launcher always resolves `@scorehub/mcp-server@latest`; it is never pinned to a specific version.
+
+The share link only installs Tiky into WorkBuddy. In the normal public path, users do not need to install `@scorehub/mcp-server` manually or edit `mcp.json` themselves.
+
+### Support / Internal Fallback Install
+
+The command-line installer remains only as a support or internal fallback:
 
 ```bash
 npx -y @scorehub/creator-outreach
 ```
 
-The installer configures only clients it detects. If it finds neither Claude Code nor WorkBuddy, it exits without writing configuration files.
+The installer configures WorkBuddy only. If it does not find WorkBuddy, it exits without writing configuration files.
 
 | Client | Detection | Installed content | How to use |
 |---|---|---|---|
-| Claude Code | `~/.claude/` exists | Agent definition in `~/.claude/agents/`; MCP configuration merged into `~/.claude.json` | Restart, then enter `@tiktok-creator-outreach` |
 | WorkBuddy | `~/.workbuddy/` exists | Plugin files in `~/.workbuddy/plugins/.../`; MCP configuration merged into `~/.workbuddy/mcp.json` | Restart, then select “ScoreHub AI TikTok Creator Marketing Expert” from the Agent list |
 
-The MCP server (`@scorehub/mcp-server`) is downloaded automatically by the configured `npx -y` command the first time it starts. A global installation is not required. WorkBuddy uses its bundled Node.js and the installer handles Windows `npx.cmd` and PATH separators.
-
-> You can also search for `@scorehub/creator-outreach` in the WorkBuddy plugin marketplace.
+Before writing the configuration, Tiky verifies the MCP server with `--self-check --json`, then WorkBuddy starts it automatically. macOS and Linux use `npx -y @scorehub/mcp-server@latest`. Windows reuses WorkBuddy's managed `node.exe` to load the matching npm `npx-cli.js` directly, avoiding `.cmd` / `.bat` process-launch compatibility problems. Tiky only guides users to the official Node.js LTS installer when the managed runtime is explicitly missing or too old.
 
 ## First Use and Authorization
 
-At the start of every new conversation, Tiky introduces its creator discovery, profile evaluation, and focused outreach-validation capabilities, explains that it is not a mass-messaging tool, and presents supported Southeast Asian markets, typical use cases, and next-step options. Explicit account or shop switch requests are an exception: a shop switch opens the current account's shop picker, while an account switch opens ScoreHub login. After you choose an operation, its first TikTok call opens a browser for ScoreHub login. Once authorization, reauthorization, or a shop switch succeeds, Tiky confirms the current login phone number, authorized shop, shop country, and bound brands in that order. Tokens are then cached under `~/.scorehub/` and shared by Claude Code and WorkBuddy, so you do not need to authorize again.
+At the start of every new conversation, Tiky first checks one of four bootstrap states: `uninitialized`, `restart_required`, `ready`, or `repair_required`. Only `ready` permits the capability introduction, account or shop switching, and business operations. The first TikTok tool call then opens ScoreHub login when authorization is needed. After authorization, reauthorization, or a shop switch, Tiky confirms the login phone number, authorized shop, country, and bound brands. Tokens remain under `~/.scorehub/` and are not removed by bootstrap or updates.
 
 If Tiky says that the current shop's TikTok authorization is invalid or unavailable, your local ScoreHub login is usually still valid. Rebind the shop in ScoreHub and try again; do not repeat browser login.
 
@@ -56,11 +63,13 @@ Ask Tiky:
 
 ### No supported client found
 
-Install and launch Claude Code or WorkBuddy once, then run the install command again. Claude Desktop is outside the current support scope.
+Install and launch WorkBuddy once, then use the share link to launch Tiky's installation in WorkBuddy.
 
 ### MCP tools are unavailable, the tool list is empty, or the connection closes
 
-ScoreHub is temporarily unavailable. Fully quit and reopen Claude Code or WorkBuddy, then try again. Contact ScoreHub support if the problem continues.
+Tiky runs the bootstrap check first. It does not attempt OAuth or business calls while installation, restart, or repair is required. If bootstrap reports `ready` but tools remain unavailable, fully quit and reopen WorkBuddy, then try again.
+
+If an error explicitly says that Node.js, npm, or npx is missing, or that Node.js is below version 18, Tiky explains the diagnosis first. After your confirmation, it guides recovery through the official Node.js LTS installation path, verifies the result, and asks you to restart WorkBuddy. This does not reauthorize or change TikTok credentials.
 
 ## Related Links
 

@@ -2,11 +2,72 @@
 
 ## Unreleased
 
+## 1.2.1
+
+### Patch Changes
+
+- Launch WorkBuddy-managed MCP processes on Windows through the bundled `node.exe` and npm `npx-cli.js`, migrate legacy batch launchers, and refresh paths after managed runtime rotations.
+
+## 1.2.0
+
+### Minor Changes
+
+- Replace signal-based WorkBuddy onboarding with a required four-state bootstrap gate that installs and verifies `mcp-server` before business operations.
+- Persist one-time installation consent, silently refresh creator-outreach afterward, always keep the MCP command on `@scorehub/mcp-server@latest`, and atomically preserve existing WorkBuddy configuration on failure.
+- Remove the previous per-upgrade confirmation and optional-diagnostic onboarding rules from the Agent, documentation, and tests.
+
+## 1.1.11
+
+### Changed
+
+- Reframe the public end-user path around the WorkBuddy share link, use `npx -y @scorehub/creator-outreach@latest` for Tiky self-upgrade and local bootstrap, and keep the command-line installer as a support-only fallback.
+- Tag WorkBuddy-managed `mcp-server` entries with host and installer metadata so upstream diagnostics can distinguish Tiky's standard public installation path.
+
+## 1.1.10
+
+### Changed
+
+- Add a creator-ranking suggestion after search results in Markdown and WorkBuddy HTML reports. Tiky now asks users to select at least two creators before starting relative scoring.
+
+## 1.1.9
+
+### Changed
+
+- Stop displaying source search conditions in creator search results, WorkBuddy HTML reports, score reports, and summaries. Keep those conditions for internal search sessions, pagination, and category validation; retain the scoring candidate scope.
+
+## 1.1.8
+
+### Fixed
+
+- Require a self-contained WorkBuddy HTML artifact for creator searches with six or more results. Markdown fallback now occurs only after an actual artifact-creation failure, not because visualization capability was not explicitly declared.
+
+## 1.1.7
+
+### Changed
+
+- Let Tiky diagnose explicit Node.js / npm / npx runtime failures after user confirmation, guide official LTS recovery in WorkBuddy, verify the repaired runtime, and keep this flow separate from OAuth, shop authorization, rate limits, and generic MCP disconnects.
+
+## 1.1.6
+
+### Changed
+
+- Show the final effective creator-search conditions before search results, without adding a confirmation turn.
+- Default creator search results to 20 and cap each search session, including pagination, at 60 displayed creators.
+
+## 1.1.5
+
+### Fixed
+
+- Treat the search result's `creator_open_id` as the single creator identifier used for both performance analysis and outreach, removing the incorrect dual-ID presentation contract.
+
+## 1.1.4
+
 ### Changed
 
 - Reposition Tiky as a TikTok creator marketing expert focused on building clear creator profiles and validating focused collaboration shortlists, rather than a mass-messaging tool.
 - Require Tiky to redirect requests to contact thousands of creators toward discovery, profile analysis, ranking, and a focused outreach-validation shortlist.
 - Show Tiky in the conversation-facing profession field while keeping the plugin display name as the ScoreHub AI product name.
+- Link creator nicknames in search results to public TikTok profile pages built from `https://www.tiktok.com/@{username}`, with Markdown and WorkBuddy HTML coverage plus safe fallback when `username` is unavailable.
 
 ## 1.1.3
 
@@ -112,7 +173,7 @@
 
 ### Patch Changes
 
-- install.js 支持同时安装到 WorkBuddy：检测 `~/.workbuddy/` 目录，自动复制插件文件并写入 `mcp.json`，Claude Code 和 WorkBuddy 可一次安装完成
+- install.js 支持安装到 WorkBuddy：检测 `~/.workbuddy/` 目录，自动复制插件文件并写入 `mcp.json`
 
 ## 1.0.4
 

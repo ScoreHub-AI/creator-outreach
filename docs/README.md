@@ -1,146 +1,130 @@
-# creator-outreach — 业务背景与功能说明
+# creator-outreach — 产品与协作文档
 
-> **实现状态**: 本文档描述目标功能全景。已实现：Agent 定义、插件清单、三个 Skill（MCP 优先调用）、评分模型/消息模板的口径文档、`create_conversation` 建联链路（sdk→mcp-remote→mcp-server）、账号与店铺切换，以及搜索和评分的固定 Markdown / WorkBuddy HTML 输出格式。建联能力定位为针对精选候选人的小范围快速验证，不承诺向成千上万达人海量群发。仍在开发：配额预算提示、品牌关键词竞品搜索、相似达人推荐。当前不做：消息监听、A/B 回复率追踪、导出功能。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
+> **实现状态**: 当前已实现 Agent 定义、WorkBuddy 插件清单、三个 Skill、评分模型与消息模板参考、`create_conversation` 建联链路、账号与店铺切换，以及搜索/评分的固定 Markdown 与 WorkBuddy HTML 输出能力。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
 
-## 业务背景
+## 文档权威来源
 
-TikTok Shop 卖家需要持续找达人合作带货。传统方式是在 TikTok Creator Marketplace 网页上手动搜索、一一点击达人主页看数据、逐个发私信——效率极低，且无法批量操作。
+`creator-outreach` 的文档按职责分层，避免多份行为规范并行演化：
 
-「Tiky」是 ScoreHub AI 打造的 TikTok 达人营销专家，以“ScoreHub AI TikTok达人营销专家 · Tiky”的身份在 WorkBuddy 发布。她帮助 TikTok Shop 卖家发现合适的达人，将带货、内容、品类和受众数据整理成清晰可比较的达人画像，再对精选名单发起小范围建联，快速验证画像与合作假设。Tiky 不是面向成千上万达人的海量群发工具。卖家可以说「帮我搜美妆类目、GMV 1000-10000 的达人，分析前 5 位的画像，再联系最匹配的 3 位验证合作可能性」。
+- **Agent 权威规范**：[`../agents/tiktok-creator-outreach.md`](../agents/tiktok-creator-outreach.md)
+  - 唯一的智能体行为规范来源
+  - 定义首轮引导、授权与切换、统一错误分流、本地运行环境恢复、市场与配额边界
+- **Skill 专项规则**：
+  - [`../skills/tiktok-creator-search/SKILL.md`](../skills/tiktok-creator-search/SKILL.md)
+  - [`../skills/tiktok-creator-analysis/SKILL.md`](../skills/tiktok-creator-analysis/SKILL.md)
+  - [`../skills/tiktok-batch-outreach/SKILL.md`](../skills/tiktok-batch-outreach/SKILL.md)
+  - 仅保留各自领域特有的触发条件、输入输出契约和关键陷阱
+- **包级 README**：
+  - [`../README.md`](../README.md)
+  - [`../README.en.md`](../README.en.md)
+  - 面向终端用户的安装、首次使用和故障排查说明
+- **公开发布与自助安装说明**：
+  - [`./WORKBUDDY_PUBLIC_ONBOARDING.md`](./WORKBUDDY_PUBLIC_ONBOARDING.md)
+  - 面向终端用户的分享链接首装、Tiky 自升级、`mcp-server` 引导和环境恢复口径
 
-## 功能说明
+若不同文档表述不一致，以 Agent 文件为准。
+
+## 产品定位
+
+Tiky 是 ScoreHub AI 面向 TikTok Shop 卖家的达人营销专家。其核心交付不是海量群发，而是：
+
+1. 搜索合适达人
+2. 建立清晰可比较的达人画像
+3. 对精选候选人做小范围建联验证
+
+因此，`creator-outreach` 的职责是定义智能体的对话行为、Skill 入口和展示契约，而不是实现 TikTok API 或持久化业务系统。
+
+## 包内职责
+
+本包主要包含以下内容：
+
+- **Agent 定义**：智能体身份、首轮欢迎语、工具使用边界和统一行为规则
+- **Skills**：搜索、评分、建联三个能力入口及各自专项契约
+- **插件元数据**：WorkBuddy 插件清单、展示名、头像、快捷入口
+- **安装器**：将插件复制到 WorkBuddy，并写入 `@scorehub/mcp-server` 的 MCP 配置
+- **公开版引导**：在 WorkBuddy 每个新会话强制执行 bootstrap 状态门禁，首次确认后预拉取并自检 `mcp-server@latest`，后续静默更新 creator-outreach，并仅在明确证据下恢复 Node.js LTS
+- **测试**：校验品牌、安装行为以及关键规范是否仍由正确文档承载
+
+本包不承担以下职责：
+
+- 不直接调用 TikTok API
+- 不保存消息、回复或运营数据
+- 不实现消息监听、A/B 回复率追踪或导出
+- 不提供绕过 ScoreHub MCP 的直连降级路径
+
+## 能力概览
 
 ### 达人搜索
 
-按以下维度搜索 Creator Marketplace 中的达人：
-
-- 关键词（TikTok 用户名/昵称）
-- GMV 区间（0-100 / 100-1000 / 1000-10000 / 10000+）
-- 销量区间（0-10 / 10-100 / 100-1000 / 1000+）
-- 类目筛选
-- 粉丝画像（年龄、性别、地区）
-- 内容表现（平均播放量、互动率）
-
-搜索结果禁止直接展示工具返回的原始 JSON，统一按以下契约输出：
-
-- 先给出结果摘要：实际返回数、总命中数、已应用条件、当前排序、是否还有下一页。
-- 达人列表固定展示排名、昵称、用户名、粉丝数、近 30 天 GMV 区间和类目匹配状态。
-- 默认保持 `search_creators` 的返回顺序；只有用户明确指定排序时才调整。
-- `creator_user_id` 和 `creator_open_id` 必须按达人保留。前者供表现分析使用，后者供建联使用；标识在界面中弱化展示，不能丢失、混用或伪造。
-- 分页只向用户展示“已显示 X / 共 Y”和是否可继续，不展示内部 `page_token`。
-- 空结果需复述本次条件，并建议放宽类目、GMV 或关键词；字段缺失统一显示 `—`，不得猜测补全。
-
-结果为 1–5 条时使用 Markdown 表格；达到 6 条时，如果宿主支持 HTML 可视化，则生成自包含的响应式 HTML 报告，并在对话中保留简短摘要。宿主不支持或生成失败时回退为完整 Markdown，不能丢失记录。
+- 通过 `search_creators` 搜索达人
+- 支持类目解析、闭环校验、分页与 60 人会话上限
+- 在 WorkBuddy 中，搜索结果达到阈值时生成 HTML 报告
 
 ### 达人分析
 
-获取单达人近 30 天表现数据：
-
-- 带货数据：GMV、销量、客单价
-- 粉丝画像：年龄分布、性别比例、地区分布
-- 内容表现：视频数、平均播放量、互动率
-- 合作类目分布
-
-按自定义评分模型（带货能力 30% + 内容影响力 25% + 粉丝规模 15% + 品类匹配 20% + 粉丝质量 10%）对达人打分排序。
-
-评分结果统一按以下契约输出：
-
-- 评分是候选集内的相对分。仅分析一位达人时不输出综合分，只展示近 30 天指标、标签、数据缺口和合作建议，并说明至少需要两位候选人才可进行相对评分。
-- 两位及以上先展示排行榜，固定包含排名、达人、综合分、带货能力、内容影响力、粉丝规模、品类匹配、粉丝质量和标签，再展示每位达人的关键指标、优势/风险、数据缺口与合作建议。
-- 默认按综合分降序；并列时依次比较带货能力、内容影响力、粉丝数，仍相同则保持原候选顺序。
-- `creator_open_id` 只能从搜索上下文透传。无法关联时标记“未保留建联标识”，不得从 `creator_performance` 响应推断。
-- 部分达人分析失败时继续展示成功结果，并单列失败名单与原因；失败值不能作为 0 分参与排序。
-- 品类数据未授权或评分字段缺失时显示 `—` 和具体缺口，不得用静默补零掩盖数据质量。
-
-评分结果同样以 6 条为 HTML 阈值。HTML 报告需包含排行榜、达人详情和数据缺口说明；所有工具返回文本在写入 HTML 前必须转义。
-
-### WorkBuddy HTML 报告约束
-
-- 使用内联 CSS/JavaScript，不依赖 CDN、远程字体或外部图片，保证报告可独立展示。
-- 搜索报告包含条件摘要、统计区、可搜索/排序表格、达人详情和分页状态；评分报告包含排行榜、维度分、达人详情和数据缺口说明。
-- `creator_user_id` / `creator_open_id` 放在可展开详情或复制区域中，不占用主表视觉焦点。
-- 只实现真实可用的搜索、排序、展开和复制交互，不添加无法触发 Agent 或 MCP 操作的伪按钮。
-- 对昵称、用户名、标签和工具返回的其他文本做 HTML 转义，禁止将返回内容作为 HTML 或脚本执行。
-- 只有实际生成报告时才能声明存在 HTML 结果，不得虚构 `outputs` 等文件路径。
+- 通过 `creator_performance` 获取近 30 天表现数据
+- 基于评分模型做候选集内相对评分
+- 单达人只输出画像与建议，不输出误导性的相对综合分
 
 ### 小范围建联验证
 
-- **定位边界**：仅用于对经过画像评估的精选候选人进行小范围触达验证，不面向成千上万达人群发
-- **两步建联**：先创建会话（`create_conversation`，用 `creator_open_id`）拿 `conversation_id`，再发送消息（`send_message`）
-- 发送 5 种类型消息：文本（TEXT）、商品卡片（PRODUCT_CARD）、定向合作邀请（TARGET_COLLABORATION_CARD）、免费样品邀请（FREE_SAMPLE_CARD）、图片（IMAGE）
-- 消息模板变量替换（`{name}` / `{brand}` / `{commission}`，3 套模板轮换）
-- 速率控制（5-8 秒间隔 + 随机抖动，防触发频率限制）
+- 先 `create_conversation`，后 `send_message`
+- 仅用于精选候选人验证，不承诺海量群发
+- 支持模板变量替换、速率控制和发送结果汇报
 
-## 调用方式
+以上能力的具体行为细节不在本文件重复展开，统一以 Agent 和对应 Skill 为准。
 
-### 优先：MCP 工具
+## 技术架构与依赖
 
-通过 ScoreHub MCP Connector 调用远程端点：
-
-```
-search_creators      → 达人搜索（返回 creator_open_id）
-creator_performance  → 达人表现分析
-create_conversation  → 创建达人会话（建联前置，用 creator_open_id）
-send_message         → 发送建联消息
-authorize            → OAuth 授权
-status               → 连接状态
-```
-
-MCP 配置使用 `npx -y @scorehub/mcp-server@latest`，首次启动会自动下载本地代理，无需全局安装。macOS、Linux、Windows 都要求 Node.js 18+ 与 npm 可用；WorkBuddy 使用捆绑 Node.js 时会按平台选择 `npx` 或 `npx.cmd`，并使用对应的 PATH 分隔符。若工具不可见、连接关闭或本地 MCP 未启动，终端用户只需完全重启宿主客户端后重试；持续失败时由 ScoreHub 支持流程排查。
-
-`authorize` / `status` 只表示本地 MCP 登录状态正常。如果真实工具调用时提示当前店铺的 TikTok 授权已失效或异常，处理方式是先到 ScoreHub 重新绑定该店铺，而不是反复重新做本地 OAuth 登录。
-
-用户要求切换店铺时，Tiky 会直接发起当前账号的店铺确认页，不要求重新登录；用户要求切换账号时，Tiky 才会重新打开 ScoreHub 登录页。新会话中的明确切换请求属于会话准备操作，直接执行而不先显示欢迎语；只说“切换”但未说明账号或店铺时，Tiky 会先询问目标。
-
-如果工具提示请求过于频繁、持续限流或配额受限，处理方式是先等待、分批重试或缩小本次请求范围；不要把这类问题当作授权失效，也不需要为了解除限流去重新登录。只有用户自己明确要求重新授权时，才应走浏览器授权。
-
-底层远程工具会返回结构化错误类型，智能体据此稳定区分：
-
-- `oauth_invalid`：本地 ScoreHub 登录失效
-- `shop_auth_invalid`：店铺 TikTok 授权失效或异常
-- `rate_limited` / `quota_exhausted`：限流或配额问题
-- `invalid_input`：请求参数不合法
-
-### 凭证管理
-
-TikTok API 应用密钥和店铺授权均由 ScoreHub 远端服务托管。`creator-outreach` 只通过 ScoreHub MCP 访问 TikTok 功能，终端用户不配置环境变量，也没有直连 TikTok API 的降级路径。
-
-## 技术架构
-
-```
+```text
 WorkBuddy (Agent Host)
     │
     ▼
-Tiky 智能体 (creator-outreach)
-    │ MCP 协议
+creator-outreach (Agent + Skills + Plugin)
+    │ MCP
     ▼
-@scorehub/mcp-server (本地代理)
+@scorehub/mcp-server
     │ Streamable HTTP
     ▼
-mcp-remote (远程端点)
+mcp-remote
     │ @scorehub/tiktok-sdk
     ▼
 TikTok Shop Partner API
 ```
 
-## 部署方式
+依赖关系说明：
 
-智能体通过 WorkBuddy 专家市场以 ScoreHub AI 品牌发布。插件使用 ScoreHub AI 标识作为头像；用户安装后，配置 ScoreHub MCP Server 即可使用，TikTok 凭证由 ScoreHub 管理。
+- `creator-outreach` 依赖 `mcp-server` 提供本地 MCP 工具注册和 OAuth 入口
+- `mcp-server` 再通过 Streamable HTTP 调用 `mcp-remote`
+- `mcp-remote` 负责与 TikTok Shop Partner API 交互
+- TikTok 凭证与店铺授权均由 ScoreHub 远端托管
 
-每个新对话的首轮由 Agent 先介绍已稳定支持的达人发现、画像评估和小范围建联验证能力，明确 Tiky 不是海量群发工具，并介绍支持的东南亚市场、典型用法和下一步选项；首轮不触发授权或 TikTok 操作。若当前对话中已有搜索结果，Agent 才可基于该结果提供分析、建联验证或重新搜索的后续建议。用户选择具体操作后，才进入既有的授权和执行流程。
+跨包设计与依赖链详见 [../../../docs/ARCHITECTURE.md](../../../docs/ARCHITECTURE.md)。
 
-WorkBuddy 插件只提供“了解 Tiky 能做什么”的快捷入口，避免在新会话首轮发送会被能力介绍规则拦截的具体操作请求。
+## 当前范围与暂不做
 
-## 常见授权问题
+当前已稳定支持：
 
-- **浏览器已经登录成功，但搜索/分析/建联仍失败**：
-  这通常不是本地 MCP 登录问题，而是当前店铺的 TikTok 授权已失效、撤销、过期或不匹配。应先到 ScoreHub 重新绑定该店铺，再回到 Tiky 重试。
+- 达人搜索与结果展示契约
+- 达人评分与 HTML/Markdown 报告契约
+- 账号切换、店铺切换和授权确认提示
+- 小范围建联验证
 
-## 常见限流问题
+仍在开发：
 
-- **短时间内连续调用后被提示请求过于频繁**：
-  这通常是频率或配额问题，不是 token 不干净，也不是必须重新授权。应先等待一段时间，再分批重试或缩小本次操作范围。除非用户自己明确要求，否则不要引导重新授权。
+- 配额感知
+- 竞品达人搜索
+- 相似达人推荐
 
-## 三个工程关系
+当前明确不做：
 
-详见 [架构总览](../../../docs/ARCHITECTURE.md)
+- 消息监听
+- A/B 回复率追踪
+- 导出功能
+
+## 维护约束
+
+- 修改智能体通用行为时，只改 Agent 权威规范，并同步调整引用它的测试
+- 修改某个能力的专属规则时，只改对应 Skill
+- 修改安装、首次使用或故障排查口径时，更新包级 README
+- 新增开发主题时，先更新本包 [ROADMAP.md](./ROADMAP.md)，完成后再同步顶层 `docs/ROADMAP.md`

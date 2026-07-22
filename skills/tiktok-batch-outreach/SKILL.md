@@ -30,13 +30,7 @@
 1. **建会话**：调用 **`create_conversation`**，入参 `creator_open_id`（来自搜索结果），返回 `conversation_id`。
 2. **发消息**：调用 **`send_message`**，入参 `conversation_id` + `msg_type: "TEXT"` + `content`（模板填充后的文本）。
 
-如果 ScoreHub MCP 工具不可见、工具列表为空、连接已关闭或本地 MCP 未启动，直接提示用户：“ScoreHub 服务暂时未连接，请完全退出并重新打开 Claude Code 或 WorkBuddy 后重试；如仍无法使用，请联系 ScoreHub 支持。”不要向终端用户提及 Node.js、npm、网络、环境变量、TikTok API 凭证或直连 API，也不要调用 `authorize`。
-
-如果工具返回结构化 JSON，优先按 `error_type` 做分流，不要靠自然语言错误文本猜测。
-
-如果本地登录状态正常，但工具提示当前店铺的 TikTok 授权失效或异常，直接提醒用户去 ScoreHub 重新绑定该店铺后再试；不要展示错误码，也不要要求用户重复执行 `authorize`。
-
-如果工具提示请求过于频繁、持续限流或配额受限，直接提醒用户暂停发送、耐心等待并稍后继续；不要建议“重新授权拿一个干净的 token”，也不要主动走 `authorize`，除非用户自己明确要求重新授权。
+授权、限流、MCP 不可用和本地运行环境恢复遵循 Agent 的权威规则，本技能不重复展开。
 
 ### 速率与话术
 
@@ -52,18 +46,9 @@
 
 ## 关键陷阱
 
-- `create_conversation` 必须用 **`creator_open_id`**（不是 `creator_user_id`）。
-- `creator_open_id` **仅来自搜索接口**，分析接口不返回——务必从搜索结果透传。
+- `create_conversation` 的入参名是 **`creator_open_id`**，其值与表现分析兼容入参 `creator_user_id` 使用的是同一个搜索结果 ID。
+- `creator_open_id` **仅来自搜索接口**，分析接口不返回——务必从搜索结果透传，不要构造第二套达人 ID。
 
 ## 错误处理
 
-| 问题类型 | 处理 |
-|----------|------|
-| MCP 工具不可见、工具列表为空、连接关闭或本地 MCP 未启动 | 提示“ScoreHub 服务暂时未连接，请完全退出并重新打开客户端后重试；如仍无法使用，请联系 ScoreHub 支持。”不提及技术配置，不走 `authorize` |
-| `oauth_invalid` | 仅在真正未授权或本地 OAuth 失效时，才允许提示用户调用 `authorize` |
-| 当前店铺的 TikTok 授权失效或异常 | 用中文提醒用户：本地登录状态正常，但当前店铺需要先到 ScoreHub 重新绑定后再试；不要展示错误码，不要要求重复 `authorize` |
-| 建会话入参不对或达人标识无效 | 检查传入的是来自搜索结果的 `creator_open_id` |
-| 消息配额已用完或当前达人不满足发送条件 | 跳过该达人，继续后续名单 |
-| 日配额已用完 | 停止全部 |
-| 请求过于频繁或持续限流 | 先提醒用户暂停发送、耐心等待并稍后继续；必要时有限退避重试。不要建议重新授权；只有用户明确要求时才走 `authorize` |
-| 参数无效 | 提示用户修正名单、消息内容或建联参数，不走授权路径 |
+建联专属错误分支仅处理 `creator_open_id` 无效、`create_conversation` 参数不合法、消息内容不合法，以及单达人消息配额或发送条件不满足；其余授权、限流、MCP 可用性与本地环境问题均遵循 Agent 权威规则。
