@@ -73,9 +73,9 @@ MCP 工具 `creator_performance` 直接透传 TikTok 详情接口的原始 JSON 
 
 字段缺失时对应维度**标注数据缺口**，不要静默填 0 造成排序失真。
 
-## 参考实现（Python，逻辑口径来源，含硬编码凭证已剔除）
+## 参考实现（Python）
 
-以下为原始脚本 `score_creator()` 的算法口径（仅作口径参考，实际以 MCP 数据代入）：
+以下 `score_creator()` 仅用于帮助理解上文规则，不是独立权威口径，也不是项目运行代码。如果示例与上文公式、字段映射或缺失值规则冲突，以上文正文中的明文规则为准。
 
 ```python
 def score_creator(c, all_creators):

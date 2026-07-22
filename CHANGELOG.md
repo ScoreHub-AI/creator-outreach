@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 1.3.0
+
+### Minor Changes
+
+- Expand creator discovery with sales, follower demographics, content performance, collaboration traits, stable pagination keys, and progressive guidance for underspecified searches.
+- Display localized creator category names in Markdown and WorkBuddy HTML results, limit the main list to three names plus an overflow count, and hide internal category IDs behind a clear unresolved-category fallback.
+
+### Fixed
+
+- Unify WorkBuddy creator search and analysis HTML reports around the `#6e38f5` brand palette while preserving distinct semantic colors for success, warning, and error states.
+- Align Tiky's welcome example with the 20-creator default, distinguish single-creator profiles from multi-creator relative scoring, and remove unsupported quota, persistence, and scheduled-outreach promises.
+- Use WorkBuddy `AskUserQuestion` multi-select interactions for ambiguous creator category and GMV filters, with custom-input resolution and numbered-text fallback.
+- Deduplicate creator-search behavior by keeping only capability summaries and cross-skill orchestration in the Agent while making the Search Skill authoritative for search-specific contracts.
+- Extend the Agent/Skill/Reference ownership model to analysis and outreach, keeping scoring formulas and message templates in their references while retaining the Python scoring example as non-authoritative guidance.
+
 ## 1.2.1
 
 ### Patch Changes

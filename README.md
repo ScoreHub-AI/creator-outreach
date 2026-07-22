@@ -2,7 +2,7 @@
 
 English version: [README.en.md](./README.en.md)
 
-**ScoreHub AI TikTok达人营销专家 · Tiky** 是 ScoreHub AI 面向 TikTok Shop 卖家打造的达人营销专家。Tiky 可按类目、GMV 和粉丝画像发现合适的达人，结合近 30 天带货、内容、品类和受众数据建立清晰可比较的达人画像，并通过精选后的小范围建联快速验证合作假设。Tiky 不是面向成千上万达人的海量群发工具。TikTok 操作通过 ScoreHub MCP 完成，TikTok API 凭证由 ScoreHub 托管，使用者无需配置。
+**ScoreHub AI TikTok达人营销专家 · Tiky** 是 ScoreHub AI 面向 TikTok Shop 卖家打造的达人营销专家。Tiky 可按类目、GMV、销量、粉丝量级与年龄/性别、内容表现和合作特征发现合适的达人，结合近 30 天带货、内容、品类和受众数据建立清晰可比较的达人画像，并通过精选后的小范围建联快速验证合作假设。Tiky 不是面向成千上万达人的海量群发工具。TikTok 操作通过 ScoreHub MCP 完成，TikTok API 凭证由 ScoreHub 托管，使用者无需配置。
 
 ## 支持的客户端
 
@@ -56,6 +56,7 @@ MCP Server（`@scorehub/mcp-server`）在写入配置前会先通过 `--self-che
 直接对 Tiky 说：
 
 - 帮我搜索适合合作的 TikTok 达人，类目是美妆，GMV 在 1000-10000 美元区间
+- 找 20 位美妆达人，粉丝 1万-10万，18-34 岁女性粉丝占比至少 60%，GMV 1K+，带货视频平均播放 5000+，快速增长的独立达人
 - 分析这 10 个达人的带货表现，帮我打分排名
 - 从排名前 5 位中选出最匹配的 3 位，用我确认的话术发起建联验证
 
