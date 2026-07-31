@@ -194,7 +194,7 @@ test('only asks for category confirmation when multiple matches remain ambiguous
 });
 
 test('defaults creator searches to top-level categories and gates child categories on explicit intent', () => {
-  assert.match(searchSkill, /SEA 店铺.*`category_version: "v2"`.*不传 `locale`/);
+  assert.match(searchSkill, /对当前支持的店铺调用.*`category_version: "v2"`.*不传 `locale`/);
   assert.match(searchSkill, /宽泛品类.*首次不传 `keyword`.*顶层类目/);
   assert.match(searchSkill, /只有用户明确指定具体子类目时.*店铺当地语言关键词/);
   assert.doesNotMatch(searchSkill, /zh-CN|category_locale/);

@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## 1.4.0
+
+### Added
+
+- Extend supported markets to include the United States (US) alongside the existing six Southeast Asian countries. Update the Agent welcome message, Search Skill country table, and plugin tags to reflect US market availability.
+
 ## 1.3.3
 
 ### Changed

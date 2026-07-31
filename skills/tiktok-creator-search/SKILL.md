@@ -25,7 +25,7 @@ description: 在 TikTok Shop Creator Marketplace 中按关键词、类目、商�
 
 如果用户提到了品类/类目关键词（如"美妆"、"3C"、"beauty"、"electronics"），**必须**先从当前授权店铺的 `get_categories` 结果获取类目 ID，再调用 `search_creators`：
 
-1. **店铺市场类目树** — 对当前支持的 SEA 店铺调用 `get_categories` 时传 `category_version: "v2"`，不传 `locale`；TikTok 按当前 `shop_cipher` 使用店铺市场的默认语言和类目 ID。
+1. **店铺市场类目树** — 对当前支持的店铺调用 `get_categories` 时传 `category_version: "v2"`，不传 `locale`；TikTok 按当前 `shop_cipher` 使用店铺市场的默认语言和类目 ID。
    - 用户表达宽泛品类时，首次不传 `keyword`，获取当前店铺的顶层类目，再按当地语言 `local_name` 与用户意图进行语义匹配。
    - 只有用户明确指定具体子类目时，才将该意图翻译为店铺当地语言关键词后传入 `keyword`；不得将中文关键词与其他市场 locale 组合获取过滤 ID。翻译或匹配不唯一时使用 WorkBuddy 选项交互，不猜测 ID。
    - **顶层定义**：只有 `parent_id == "0"` 的类目才是达人搜索默认使用的顶层类目；`is_leaf=false` 只能说明不是叶子节点，不能据此把中间层当作顶层。
@@ -144,8 +144,9 @@ description: 在 TikTok Shop Creator Marketplace 中按关键词、类目、商�
 | 菲律宾 | PH |
 | 印度尼西亚 | ID |
 | 新加坡 | SG |
+| 美国 | US |
 
-用户在搜索前若明确指定目标市场（如"帮我找日本的达人"、"搜索美国市场创作者"），应**立即告知不支持该市场**，并建议用户改选以上 SEA 市场之一，不要直接调用 `search_creators`。
+用户在搜索前若明确指定目标市场（如"帮我找日本的达人"），应**立即告知不支持该市场**，并建议用户改选以上支持的市场之一，不要直接调用 `search_creators`。
 
 ## 错误处理
 
