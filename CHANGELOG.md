@@ -1,5 +1,15 @@
 # @scorehub/creator-outreach
 
+## 1.5.0
+
+### Added
+
+- Add the `tiktok-similar-creators` Skill for finding creators similar to a template creator via the `find_similar_creators` tool (multi-channel recall + two-stage weighted similarity scoring).
+
+### Changed
+
+- Note in the Search Skill that the server normalizes `category` filters against the shop's category tree (auto-fills direct children of a top-level category, rolls deeper ids up to their direct-child ancestor, drops unrelated ids). This unblocks US-market category search (which rejects an empty `child_category_id_list`) while keeping the Agent's "default top-level" construction contract unchanged.
+
 ## 1.4.0
 
 ### Added

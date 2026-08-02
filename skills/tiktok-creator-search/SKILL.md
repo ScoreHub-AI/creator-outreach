@@ -43,6 +43,8 @@ description: 在 TikTok Shop Creator Marketplace 中按关键词、类目、商�
 4. 将构造好的 `category` 参数传给 `search_creators`
 
 > **核心原则**：默认顶层覆盖；只有用户明确指定子类目时才缩小范围。层级只能到“顶层类目 + 直接子类目”，宁愿回退顶层多搜，也不要猜测或使用深层 ID。
+>
+> **服务端兜底（无需 Agent 额外处理）**：`search_creators` 会用当前店铺类目树自动规整 `category`——只传 `parent_category_id` 时补全其直接子类目（美国市场必需，否则被 TikTok 拒绝并返回 `16032001`）；传入的子类目若是更深层级会被上卷到所属的直接子类目，与父类目无关的 ID 被剔除。仍应按上述规则构造，兜底只用于防止漏传或层级偏差导致的空结果。
 
 调用 MCP 工具 **`search_creators`**，不要写脚本。若已授权可直接调用；未授权时先走 `authorize`。
 

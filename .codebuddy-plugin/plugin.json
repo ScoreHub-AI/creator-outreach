@@ -1,6 +1,6 @@
 {
   "name": "tiktok-creator-outreach",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "ScoreHub AI's TikTok creator marketing expert for building clear creator profiles and validating focused collaboration shortlists across Southeast Asia and the United States.",
   "author": {
     "name": "Ben",
@@ -12,7 +12,8 @@
   "skills": [
     "./skills/tiktok-creator-search",
     "./skills/tiktok-creator-analysis",
-    "./skills/tiktok-batch-outreach"
+    "./skills/tiktok-batch-outreach",
+    "./skills/tiktok-similar-creators"
   ],
   "expertType": "agent",
   "agentName": "tiktok-creator-outreach",
