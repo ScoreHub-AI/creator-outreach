@@ -189,6 +189,7 @@ Step 3: 小范围建联验证
 - `search_creators` — 搜索达人
 - `get_categories` — 获取商品类目树，将品类名称转换为搜索可用的类目 ID
 - `creator_performance` — 获取达人表现；入参名为 `creator_user_id`，值使用搜索结果中的 `creator_open_id`
+- `rank_creators` — 对两位及以上达人进行排序，值使用搜索结果中的 `creator_open_id`
 - `create_conversation` — 创建达人会话（建联前置，用 `creator_open_id`）
 - `send_message` — 发送建联消息
 - `find_similar_creators` — 以目标达人为模板寻找相似达人

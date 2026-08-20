@@ -262,10 +262,14 @@ test('constrains creator scoring results and avoids misleading single-creator sc
   assert.match(analysisSkill, /禁止直接展示 MCP 原始 JSON/);
   assert.match(analysisSkill, /不输出综合分或五维相对分/);
   assert.match(analysisSkill, /至少需要 2 位候选人才可评分排名/);
-  assert.match(analysisSkill, /排名 \/ 达人 \/ 综合分 \/ 带货能力 \/ 内容影响力 \/ 粉丝规模 \/ 品类匹配 \/ 粉丝质量 \/ 标签/);
-  assert.match(analysisSkill, /标签 \/ 推荐结论 \/ 推荐理由/);
+  assert.match(analysisSkill, /排名 \/ 达人 \/ 关键表现 \/ 标签 \/ 推荐结论 \/ 推荐理由/);
   assert.match(analysisSkill, /两条推荐依据、主要风险、建议动作/);
-  assert.match(analysisSkill, /综合分降序.*带货能力分.*内容影响力分.*粉丝数降序/);
+  assert.match(analysisSkill, /严格沿用 `rank_creators` 返回的顺序和排名/);
+  assert.match(analysisSkill, /`ranking` 为 `null`.*`performance_documents`.*降级排序/);
+  assert.match(analysisSkill, /该分支只在内部处理，不询问或说明使用了哪种排序实现/);
+  assert.match(analysisSkill, /不得再次调用 `creator_performance` 或 `rank_creators`/);
+  assert.match(analysisSkill, /`acquisition.status = "succeeded"`.*`payload.code = 0`/);
+  assert.match(analysisSkill, /不得展示或推断内部排序实现、分数或维度/);
   assert.match(analysisSkill, /失败值作为 0 分参与排序/);
   assert.match(analysisSkill, /入参名保留为 `creator_user_id`，其值必须直接使用搜索结果中的 `creator_open_id`/);
   assert.match(analysisSkill, /`creator_performance` 不返回该 ID/);
