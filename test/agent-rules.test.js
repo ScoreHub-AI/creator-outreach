@@ -26,6 +26,7 @@ const packageReadmeEn = fs.readFileSync(packageReadmeEnPath, 'utf8');
 const onboardingPath = path.join(__dirname, '..', 'docs', 'WORKBUDDY_PUBLIC_ONBOARDING.md');
 const onboardingDoc = fs.readFileSync(onboardingPath, 'utf8');
 const repositoryRoot = path.join(__dirname, '..', '..', '..');
+const brochure = fs.readFileSync(path.join(repositoryRoot, 'docs', 'TIKY-PROMOTIONAL-BROCHURE.md'), 'utf8');
 const agentsDoc = fs.readFileSync(path.join(repositoryRoot, 'AGENTS.md'), 'utf8');
 const claudeDoc = fs.readFileSync(path.join(repositoryRoot, 'CLAUDE.md'), 'utf8');
 const packageJson = require('../package.json');
@@ -184,6 +185,41 @@ test('keeps the welcome example and capability promises aligned with actual beha
 
   assert.match(outreachSkill, /不支持定时或跨时区调度/);
   assert.doesNotMatch(outreachSkill, /9:00-21:00/);
+});
+
+test('keeps the 13-country market boundary authoritative in the agent', () => {
+  const supportedMarkets = [
+    ['泰国', 'Thailand', 'TH'],
+    ['马来西亚', 'Malaysia', 'MY'],
+    ['越南', 'Vietnam', 'VN'],
+    ['菲律宾', 'Philippines', 'PH'],
+    ['印度尼西亚', 'Indonesia', 'ID'],
+    ['新加坡', 'Singapore', 'SG'],
+    ['美国', 'United States', 'US'],
+    ['英国', 'United Kingdom', 'GB'],
+    ['德国', 'Germany', 'DE'],
+    ['意大利', 'Italy', 'IT'],
+    ['法国', 'France', 'FR'],
+    ['西班牙', 'Spain', 'ES'],
+    ['爱尔兰', 'Ireland', 'IE'],
+  ];
+
+  assert.equal((agent.match(/当前覆盖 13 个国家市场/g) || []).length, 2);
+  for (const [countryZh, countryEn, code] of supportedMarkets) {
+    for (const source of [agent, packageReadme]) {
+      assert.match(source, new RegExp(`${countryZh}（${code}）`));
+    }
+    assert.match(brochure, new RegExp(countryZh));
+    assert.match(packageReadmeEn, new RegExp(`${countryEn} \\(${code}\\)`));
+  }
+
+  assert.match(searchSkill, /支持市场 allowlist.*以 Agent.*唯一权威来源/);
+  assert.doesNotMatch(searchSkill, /\| 国家 \| 代码 \|/);
+  assert.match(pluginJson.description, /13 markets.*Southeast Asia.*United States.*Europe/);
+  assert.ok(pluginJson.tags.some((tag) => tag.en === 'Europe' && tag.zh === '欧洲'));
+  assert.match(packageReadme, /当前覆盖 13 个国家市场/);
+  assert.match(packageReadmeEn, /currently covers 13 country markets/);
+  assert.match(brochure, /13 个国家市场协同/);
 });
 
 test('only asks for category confirmation when multiple matches remain ambiguous', () => {

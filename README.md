@@ -4,6 +4,10 @@ English version: [README.en.md](./README.en.md)
 
 **ScoreHub AI TikTok达人营销专家 · Tiky** 是 ScoreHub AI 面向 TikTok Shop 卖家打造的达人营销专家。Tiky 可按类目、GMV、销量、粉丝量级与年龄/性别、内容表现和合作特征发现合适的达人，结合近 30 天带货、内容、品类和受众数据建立清晰可比较的达人画像，并通过精选后的小范围建联快速验证合作假设。Tiky 不是面向成千上万达人的海量群发工具。TikTok 操作通过 ScoreHub MCP 完成，TikTok API 凭证由 ScoreHub 托管，使用者无需配置。
 
+## 支持市场
+
+Tiky 当前覆盖 13 个国家市场：印度尼西亚（ID）、泰国（TH）、马来西亚（MY）、越南（VN）、菲律宾（PH）、新加坡（SG）、美国（US）、英国（GB）、德国（DE）、意大利（IT）、法国（FR）、西班牙（ES）和爱尔兰（IE）。市场边界以 Agent 规范为准。
+
 ## 支持的客户端
 
 - WorkBuddy

@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## Unreleased
+
+### Added
+
+- Extend the supported-market boundary from seven to 13 countries by adding the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), and Ireland (IE). Keep the Agent as the authoritative allowlist and have the Search Skill reference that shared boundary.
+
 ## 1.6.0
 
 ### Unreleased Changes

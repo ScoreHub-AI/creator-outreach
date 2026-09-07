@@ -4,6 +4,10 @@ Chinese version: [README.md](./README.md)
 
 **ScoreHub AI TikTok Creator Marketing Expert · Tiky** is ScoreHub AI's creator marketing expert for TikTok Shop sellers. Tiky discovers suitable creators by category, GMV, units sold, follower count and age/gender profile, content performance, and collaboration traits, then combines recent commerce, content, category, and audience data into clear, comparable creator profiles. Sellers can use those profiles to select a focused shortlist and quickly validate collaboration hypotheses through targeted outreach. Tiky is not a mass-messaging tool for contacting thousands of creators. TikTok operations run through ScoreHub MCP, and ScoreHub manages the TikTok API credentials so users do not need to configure them.
 
+## Supported Markets
+
+Tiky currently covers 13 country markets: Indonesia (ID), Thailand (TH), Malaysia (MY), Vietnam (VN), the Philippines (PH), Singapore (SG), the United States (US), the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), and Ireland (IE). The Agent specification is authoritative for this market boundary.
+
 ## Supported Clients
 
 - WorkBuddy
