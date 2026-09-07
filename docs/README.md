@@ -1,6 +1,6 @@
 # creator-outreach — 产品与协作文档
 
-> **实现状态**: 当前已实现 Agent 定义、WorkBuddy 插件清单、三个 Skill、评分模型与消息模板参考、`create_conversation` 建联链路、账号与店铺切换，以及搜索/评分的固定 Markdown 与 WorkBuddy HTML 输出能力。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
+> **实现状态**: 当前已实现 Agent 定义、WorkBuddy 插件清单、三个 Skill、Rank 分数契约与消息模板参考、`create_conversation` 建联链路、账号与店铺切换，以及搜索/评分的固定 Markdown 与 WorkBuddy HTML 输出能力。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
 
 ## 文档权威来源
 
@@ -16,7 +16,7 @@
   - 各自领域特有的触发条件、输入输出契约和关键陷阱的权威来源
 - **Reference 细节规则**：
   - 搜索筛选字段、自然语言映射、取值范围与互斥关系以 [`../skills/tiktok-creator-search/references/creator-search-filters.md`](../skills/tiktok-creator-search/references/creator-search-filters.md) 为准
-  - 评分公式、权重、字段映射与标签以 [`../skills/tiktok-creator-analysis/references/scoring-model.md`](../skills/tiktok-creator-analysis/references/scoring-model.md) 为准
+  - Rank 分数来源、排名顺序、分数缺失和展示边界以 [`../skills/tiktok-creator-analysis/references/scoring-model.md`](../skills/tiktok-creator-analysis/references/scoring-model.md) 为准
   - 话术正文、轮换和变量以 [`../skills/tiktok-batch-outreach/references/message-templates.md`](../skills/tiktok-batch-outreach/references/message-templates.md) 为准
   - Reference 中明文规则与参考实现冲突时，以明文规则为准
 - **包级 README**：
@@ -27,7 +27,7 @@
   - [`./WORKBUDDY_PUBLIC_ONBOARDING.md`](./WORKBUDDY_PUBLIC_ONBOARDING.md)
   - 面向终端用户的分享链接首装、Tiky 自升级、`mcp-server` 引导和环境恢复口径
 
-若不同文档表述不一致，共享行为以 Agent 为准，领域专项行为以对应 Skill 为准，公式、字段和模板细节以对应 Reference 为准。
+若不同文档表述不一致，共享行为以 Agent 为准，领域专项行为以对应 Skill 为准，字段、边界和模板细节以对应 Reference 为准。
 
 ## 产品定位
 
@@ -72,9 +72,9 @@ Tiky 是 ScoreHub AI 面向 TikTok Shop 卖家的达人营销专家。其核心�
 ### 达人分析
 
 - 通过 `creator_performance` 获取近 30 天表现数据
-- 基于评分模型做候选集内相对评分
+- 一个或多个达人都直接使用 Rank 返回的候选分数和排名，不在 Agent 内重新计算
 - 多达人报告提供目标优先的推荐结论、榜单短理由与详情证据链，并如实呈现风险和数据缺口
-- 单达人只输出画像、合作判断与建议，不输出误导性的相对综合分
+- 单达人评分请求同样展示 Rank 的绝对分数，并输出画像、合作判断与建议；不生成额外的相对综合分
 
 ### 小范围建联验证
 
@@ -136,6 +136,6 @@ TikTok Shop Partner API
 
 - 修改智能体通用行为时，只改 Agent 权威规范，并同步调整引用它的测试
 - 修改某个能力的专属规则时，只改对应 Skill
-- 修改评分公式、字段映射或话术模板时，只改对应 Reference；Skill 只在引用关系或对外能力变化时同步更新
+- 修改 Rank 分数映射、字段边界或话术模板时，只改对应 Reference；Skill 只在引用关系或对外能力变化时同步更新
 - 修改安装、首次使用或故障排查口径时，更新包级 README
 - 新增开发主题时，先更新本包 [ROADMAP.md](./ROADMAP.md)，完成后再同步顶层 `docs/ROADMAP.md`

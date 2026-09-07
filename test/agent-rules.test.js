@@ -139,7 +139,7 @@ test('constrains creator search results to the stable presentation contract', ()
   assert.match(searchSkill, /调用 `creator_performance` 时将该值放入兼容入参 `creator_user_id`/);
   assert.match(searchSkill, /调用 `create_conversation` 时将同一个值放入 `creator_open_id`/);
   assert.match(searchSkill, /达人 ID 不可用/);
-  assert.match(searchSkill, /选择 2 位及以上达人进行相对评分排名/);
+  assert.match(searchSkill, /选择一位或多位达人进行 Rank 评分/);
   assert.match(searchSkill, /未找到符合条件的达人/);
   assert.match(searchSkill, /`category_details\[\]\.local_name`/);
   assert.match(searchSkill, /主列表最多显示 3 个名称，更多显示“\+N”/);
@@ -175,8 +175,8 @@ test('keeps the welcome example and capability promises aligned with actual beha
   assert.match(packageReadme, /GMV、销量、粉丝量级与年龄\/性别、内容表现和合作特征/);
   assert.match(packageReadme, /女性粉丝占比至少 60%.*带货视频平均播放 5000\+/);
   assert.match(packageReadmeEn, /units sold, follower count and age\/gender profile, content performance, and collaboration traits/);
-  assert.match(agent, /单人给出画像与合作建议，2 位及以上可进行 100 分制相对评分排名/);
-  assert.doesNotMatch(agent, /为每位达人给出 100 分制综合评分/);
+  assert.match(agent, /单人或多人均可使用 Rank 返回的分数和排名；评分请求不设人数下限或上限/);
+  assert.doesNotMatch(agent, /100 分制综合评分/);
   assert.match(agent, /不具备剩余配额查询或逐次精确消耗统计能力/);
   assert.doesNotMatch(agent, /每次操作都会告知消耗量/);
   assert.match(agent, /本包无持久化存储/);
@@ -206,11 +206,7 @@ test('defaults creator searches to top-level categories and gates child categori
   assert.match(searchSkill, /无法从工具结果可靠完成映射时，回退为只传顶层类目/);
   assert.doesNotMatch(searchSkill, /兜底匹配子类目/);
   assert.doesNotMatch(searchSkill, /仅当没有合适父类目时降级/);
-  assert.match(scoringModel, /默认使用 `parent_id == "0"` 的顶层类目 ID/);
-  assert.match(scoringModel, /仅当用户明确指定某个直接子类目时/);
-  assert.match(scoringModel, /只能使用本轮当前授权店铺的 `get_categories` 结果/);
-  assert.match(scoringModel, /不得硬编码、跨店铺复用或合并多个市场的类目 ID/);
-  assert.doesNotMatch(scoringModel, /600024|601303|602118|602284|601450|600025|600026/);
+  assert.doesNotMatch(scoringModel, /parent_id|category_ids|600024|601303|602118|602284|601450|600025|600026/);
 });
 
 test('uses WorkBuddy AskUserQuestion for ambiguous creator search filters', () => {
@@ -257,42 +253,38 @@ test('keeps creator-search implementation details out of the agent', () => {
   assert.doesNotMatch(agent, /HTML 产物通道/);
 });
 
-test('constrains creator scoring results and avoids misleading single-creator scores', () => {
-  assert.match(analysisSkill, /达人分析与评分专项行为的权威来源/);
+test('uses Rank scores and avoids local creator scoring', () => {
+  assert.match(analysisSkill, /达人分析专项行为的权威来源/);
   assert.match(analysisSkill, /禁止直接展示 MCP 原始 JSON/);
-  assert.match(analysisSkill, /不输出综合分或五维相对分/);
-  assert.match(analysisSkill, /至少需要 2 位候选人才可评分排名/);
-  assert.match(analysisSkill, /排名 \/ 达人 \/ 关键表现 \/ 标签 \/ 推荐结论 \/ 推荐理由/);
-  assert.match(analysisSkill, /两条推荐依据、主要风险、建议动作/);
+  assert.match(analysisSkill, /评分请求无论包含 1 位还是任意数量的候选/);
+  assert.match(analysisSkill, /评分请求必须调用 `rank_creators`；成功时展示 Rank 返回的 `score`，单人也照常展示/);
+  assert.match(analysisSkill, /若用户只请求事实画像而未请求评分，才可单独调用 `creator_performance`/);
+  assert.doesNotMatch(analysisSkill, /至少需要 2 位候选人才可评分排名|不调用 `rank_creators`/);
+  assert.match(analysisSkill, /排名 \/ 达人 \/ Rank 分数 \/ 关键表现 \/ 推荐结论 \/ 推荐理由/);
+  assert.match(analysisSkill, /Rank 分数（如有）、优势\/风险、数据缺口/);
   assert.match(analysisSkill, /严格沿用 `rank_creators` 返回的顺序和排名/);
-  assert.match(analysisSkill, /`ranking` 为 `null`.*`performance_documents`.*降级排序/);
-  assert.match(analysisSkill, /该分支只在内部处理，不询问或说明使用了哪种排序实现/);
-  assert.match(analysisSkill, /不得再次调用 `creator_performance` 或 `rank_creators`/);
-  assert.match(analysisSkill, /`acquisition.status = "succeeded"`.*`payload.code = 0`/);
-  assert.match(analysisSkill, /不得展示或推断内部排序实现、分数或维度/);
+  assert.match(analysisSkill, /`ranking` 为 `null`.*`performance_documents`.*无法完成 Rank 排名/);
+  assert.match(analysisSkill, /不得为同一批候选另行调用 `creator_performance` 代替 Rank/);
+  assert.match(analysisSkill, /`ranked\[\]\.score` 是 Rank 返回的综合分/);
+  assert.match(analysisSkill, /不推断分数含义、维度、权重或模型策略/);
   assert.match(analysisSkill, /失败值作为 0 分参与排序/);
   assert.match(analysisSkill, /入参名保留为 `creator_user_id`，其值必须直接使用搜索结果中的 `creator_open_id`/);
   assert.match(analysisSkill, /`creator_performance` 不返回该 ID/);
-  assert.match(analysisSkill, /评分对象范围/);
-  assert.match(analysisSkill, /评分公式、权重、标签、字段映射和缺失值计算的唯一权威来源/);
+  assert.match(analysisSkill, /Rank 返回的评分对象范围/);
+  assert.match(analysisSkill, /Rank 分数来源、格式和缺失处理/);
   assert.doesNotMatch(analysisSkill, /\| 带货能力 \| 30% \|/);
+  assert.doesNotMatch(analysisSkill, /降级排序/);
 
-  assert.match(scoringModel, /综合评分 = 带货能力×30%.*粉丝质量×10%/);
-  assert.match(scoringModel, /推荐结论解释的是\*\*当前候选集内的合作优先级\*\*/);
-  assert.match(scoringModel, /`p = \(rank - 1\) \/ \(n - 1\)`/);
-  assert.match(scoringModel, /`p <= 0\.30`.*优先推荐/s);
-  assert.match(scoringModel, /`0\.30 < p <= 0\.70`.*值得测试/s);
-  assert.match(scoringModel, /`p > 0\.70`.*谨慎考虑/s);
-  assert.match(scoringModel, /明确不匹配 → 本轮不推荐/);
-  assert.match(scoringModel, /核心数据缺失 → 谨慎考虑/);
-  assert.match(scoringModel, /推荐结论.*推荐依据.*主要风险.*建议动作/s);
-  assert.match(scoringModel, /暂不推荐.*信息不足，暂缓推荐.*值得进一步验证.*需加入更多候选后判断优先级/s);
-  assert.match(scoringModel, /## MCP 字段映射说明/);
-  assert.match(scoringModel, /## 参考实现（Python）/);
-  assert.match(scoringModel, /`score_creator\(\)` 仅用于帮助理解/);
-  assert.match(scoringModel, /不是独立权威口径/);
-  assert.match(scoringModel, /以上文正文中的明文规则为准/);
-  assert.match(scoringModel, /def score_creator\(c, all_creators, target_cat_ids\):/);
+  assert.match(scoringModel, /Rank 服务负责综合评分、候选可用性分组和最终顺序/);
+  assert.match(scoringModel, /`ranking\.ranked\[\]\.score`/);
+  assert.match(scoringModel, /`model_output\.strategy_score`/);
+  assert.match(scoringModel, /不自行归一化、取整、乘除比例或追加 `\/100`/);
+  assert.match(scoringModel, /Rank 返回 `ranking: null`.*无法统一排名/);
+  assert.match(scoringModel, /无论确认 1 位还是任意数量达人，都调用 `rank_creators`/);
+  assert.match(scoringModel, /只拒绝空列表，不设本地人数上限/);
+  assert.doesNotMatch(scoringModel, /确认 1 位达人时调用 `creator_performance`/);
+  assert.match(scoringModel, /禁止恢复旧版五维公式、标签阈值或百分位结论/);
+  assert.doesNotMatch(scoringModel, /综合评分 =|def score_creator|带货能力×30%/);
 
   for (const summary of [agent, docsReadme, packageReadme, packageReadmeEn]) {
     assert.doesNotMatch(summary, /p = \(rank - 1\)|p <= 0\.30|0\.30 < p <= 0\.70|60 个中文字符/);
@@ -350,7 +342,7 @@ test('keeps outreach-specific confirmation and delivery rules in the outreach sk
 });
 
 test('keeps analysis and outreach implementation details out of the agent', () => {
-  assert.match(agent, /评分模型.*遵循 `tiktok-creator-analysis` Skill/);
+  assert.match(agent, /Rank 评分.*遵循 `tiktok-creator-analysis` Skill/);
   assert.match(agent, /发送前确认.*遵循 `tiktok-batch-outreach` Skill/);
   assert.match(agent, /利益前置 Offer 预设.*通知栏前 15 字预览/);
   assert.doesNotMatch(agent, /带货能力30%/);
@@ -393,11 +385,11 @@ test('keeps docs README as a product and collaboration document instead of a sec
   assert.match(docsReadme, /唯一的共享行为规范来源/);
   assert.match(docsReadme, /领域特有.*权威来源/);
   assert.match(docsReadme, /Reference 细节规则/);
-  assert.match(docsReadme, /共享行为以 Agent 为准，领域专项行为以对应 Skill 为准，公式、字段和模板细节以对应 Reference 为准/);
+  assert.match(docsReadme, /共享行为以 Agent 为准，领域专项行为以对应 Skill 为准，字段、边界和模板细节以对应 Reference 为准/);
   assert.match(docsReadme, /包级 README/);
   assert.match(docsReadme, /以上能力的具体行为细节不在本文件重复展开/);
   assert.match(docsReadme, /修改智能体通用行为时，只改 Agent 权威规范/);
-  assert.match(docsReadme, /修改评分公式、字段映射或话术模板时，只改对应 Reference/);
+  assert.match(docsReadme, /修改 Rank 分数映射、字段边界或话术模板时，只改对应 Reference/);
 });
 
 test('keeps the project-wide Agent Skill Reference ownership mechanism aligned', () => {

@@ -1,5 +1,15 @@
 # @scorehub/creator-outreach
 
+## 1.6.0
+
+### Unreleased Changes
+
+- Use the Rank-provided candidate score and order as the sole scoring source for one or more creators, without a local candidate-count limit; keep Performance as supporting facts and do not recompute the retired local scoring model when Rank cannot score.
+
+### Minor Changes
+
+- Use the `rank_creators` MCP tool for multi-creator analysis and preserve Performance facts when the Rank service returns no final ranking.
+
 ## 1.5.0
 
 ### Added

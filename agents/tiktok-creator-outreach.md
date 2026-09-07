@@ -71,7 +71,7 @@ bootstrap 返回 `ready` 后，再识别以下明确意图：
 > - 带货数据：GMV、销量、客单价
 > - 内容表现：视频数、播放量、互动率
 > - 粉丝画像：年龄与性别分布、市场归属
-> - 单人给出画像与合作建议，2 位及以上可进行 100 分制相对评分排名
+> - 单人或多人均可使用 Rank 返回的分数和排名；评分请求不设人数下限或上限
 >
 > **3. 建联验证** — 对精选候选人创建会话并发送合作消息
 > - 支持文本、商品卡片、定向合作邀请、免费样品邀请和图片消息
@@ -116,8 +116,8 @@ bootstrap 返回 `ready` 后，再识别以下明确意图：
 
 ### 2. 达人表现分析
 获取达人的近 30 天表现并给出合作判断。
-- 单人输出画像与建议；候选集至少有 2 位达人时才进行相对评分排名。
-- 数据字段、评分模型、缺口处理和结果展示完整遵循 `tiktok-creator-analysis` Skill，不在 Agent 中重复定义。
+- 单人或多人评分都调用 `rank_creators` 使用 Rank 分数和排名；只有纯事实画像请求才单独调用 `creator_performance`。
+- 数据字段、Rank 分数、缺口处理和结果展示完整遵循 `tiktok-creator-analysis` Skill，不在 Agent 中重复定义。
 
 ### 3. 小范围建联验证
 对经过画像评估的精选候选人创建会话并发送建联消息，用于快速验证合作假设，不以海量群发为目标。
@@ -152,7 +152,7 @@ Step 3: 小范围建联验证
 不直接展示 MCP 原始 JSON。各能力的详细输入输出契约由对应 Skill 统一维护：
 
 - 搜索参数、选项交互、分页、字段、排序、主页链接与 WorkBuddy HTML 领域规则遵循 `tiktok-creator-search` Skill。
-- 单人画像、多人评分、数据缺口、排名与 WorkBuddy HTML 领域规则遵循 `tiktok-creator-analysis` Skill。
+- 单人或多人 Rank 评分、事实画像、数据缺口、排名与 WorkBuddy HTML 领域规则遵循 `tiktok-creator-analysis` Skill。
 - 建联确认、速率、消息和进度规则遵循 `tiktok-batch-outreach` Skill。
 - 搜索返回的 `creator_open_id` 是分析与建联共用的唯一达人标识，不得丢失、改写或推断。
 - 任何能力都不得编造缺失指标、内容风格、合作历史或不存在的报告产物。
@@ -189,7 +189,7 @@ Step 3: 小范围建联验证
 - `search_creators` — 搜索达人
 - `get_categories` — 获取商品类目树，将品类名称转换为搜索可用的类目 ID
 - `creator_performance` — 获取达人表现；入参名为 `creator_user_id`，值使用搜索结果中的 `creator_open_id`
-- `rank_creators` — 对两位及以上达人进行排序，值使用搜索结果中的 `creator_open_id`
+- `rank_creators` — 对一个或多个达人评分和排序，值使用搜索结果中的 `creator_open_id`
 - `create_conversation` — 创建达人会话（建联前置，用 `creator_open_id`）
 - `send_message` — 发送建联消息
 - `find_similar_creators` — 以目标达人为模板寻找相似达人
