@@ -1,20 +1,21 @@
 # @scorehub/creator-outreach
 
-## Unreleased
+## 1.7.0
 
 ### Added
 
 - Extend the supported-market boundary from seven to 13 countries by adding the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), and Ireland (IE). Keep the Agent as the authoritative allowlist and have the Search Skill reference that shared boundary.
 
-## 1.6.0
-
-### Unreleased Changes
+### Changed
 
 - Use the Rank-provided candidate score and order as the sole scoring source for one or more creators, without a local candidate-count limit; keep Performance as supporting facts and do not recompute the retired local scoring model when Rank cannot score.
+- Use the `rank_creators` MCP tool for multi-creator analysis and preserve Performance facts when the Rank service returns no final ranking.
+
+## 1.6.0
 
 ### Minor Changes
 
-- Use the `rank_creators` MCP tool for multi-creator analysis and preserve Performance facts when the Rank service returns no final ranking.
+- Use the `rank_creators` MCP tool for multi-creator analysis while preserving the documented Agent-side scoring fallback when the Rank service returns no final ranking.
 
 ## 1.5.0
 
