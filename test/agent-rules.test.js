@@ -13,6 +13,10 @@ const analysisSkillPath = path.join(__dirname, '..', 'skills', 'tiktok-creator-a
 const analysisSkill = fs.readFileSync(analysisSkillPath, 'utf8');
 const scoringModelPath = path.join(__dirname, '..', 'skills', 'tiktok-creator-analysis', 'references', 'scoring-model.md');
 const scoringModel = fs.readFileSync(scoringModelPath, 'utf8');
+const similaritySkillPath = path.join(__dirname, '..', 'skills', 'tiktok-similar-creators', 'SKILL.md');
+const similaritySkill = fs.readFileSync(similaritySkillPath, 'utf8');
+const similarityModelPath = path.join(__dirname, '..', 'skills', 'tiktok-similar-creators', 'references', 'similarity-model.md');
+const similarityModel = fs.readFileSync(similarityModelPath, 'utf8');
 const outreachSkillPath = path.join(__dirname, '..', 'skills', 'tiktok-batch-outreach', 'SKILL.md');
 const outreachSkill = fs.readFileSync(outreachSkillPath, 'utf8');
 const messageTemplatesPath = path.join(__dirname, '..', 'skills', 'tiktok-batch-outreach', 'references', 'message-templates.md');
@@ -324,6 +328,20 @@ test('uses Rank scores and avoids local creator scoring', () => {
 
   for (const summary of [agent, docsReadme, packageReadme, packageReadmeEn]) {
     assert.doesNotMatch(summary, /p = \(rank - 1\)|p <= 0\.30|0\.30 < p <= 0\.70|60 个中文字符/);
+  }
+});
+
+test('uses the external service as the only final similarity scorer', () => {
+  assert.match(similaritySkill, /相似达人推荐专项行为的权威来源/);
+  assert.match(similaritySkill, /外部相似度服务/);
+  assert.match(similaritySkill, /不切换到其他评分方法/);
+  assert.match(similarityModel, /唯一评分来源/);
+  assert.match(similarityModel, /最终排序唯一依据/);
+  assert.match(similarityModel, /粗排只用于控制 TikTok Performance 调用量，不作为最终对外分数/);
+  assert.match(similarityModel, /不能作为失败时的替代结果/);
+
+  for (const source of [similaritySkill, similarityModel]) {
+    assert.doesNotMatch(source, /本地六维|本地评分|本地模型|自动降级|local_fallback|similarity_dimensions|scoring_source/);
   }
 });
 

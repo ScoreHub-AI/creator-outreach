@@ -2,58 +2,32 @@
 
 本文件是相似度评分模型的唯一权威 Reference。`tiktok-similar-creators` Skill 和 Agent 只做引用摘要，不重复展开。
 
-## 一、两阶段评分
+## 一、外部评分与两阶段流程
+
+外部双达人相似度服务是 `find_similar_creators` 的唯一评分来源，接口字段和错误契约见仓库顶层的 [达人相似度服务调用说明](../../../../../creator-similarity-api.md)。调用 `POST /v1/creator-similarities` 时，目标达人和候选达人均使用 TikTok Performance 返回的 `data.creator` 对象。
+
+- 外部服务返回的 `similarity_score`（0–100）在 MCP 层归一化为 0–1 后再展示。
+- 外部服务为每个评分结果返回 `confidence`；它是数据覆盖置信度，不是相似度，低置信度结果必须标明数据不足，不能仅按分数解读。
+- 外部结果是最终排序唯一依据，不与其他评分方法平均或加权混合。
+- 服务未配置、调用失败或响应不符合契约时返回结构化错误，不返回替代评分结果。
+
+召回和候选预算仍由 `find_similar_creators` 负责：三路召回合并去重后最多保留 24 位，默认最多对 12 位候选获取 Performance 并送入评分服务。粗排只用于控制 TikTok Performance 调用量，不作为最终对外分数。
 
 | 阶段 | 数据源 | API 调用 | 维度 | 用途 |
 |------|--------|---------|------|------|
 | 粗排 | `searchCreators` 返回字段 | 0 | 品类 + 粉丝量 | 从候选池（≤24）筛出 Top-K 进入精排 |
-| 精排 | `getCreatorPerformance` 全量指标 | ≤12 | 6 维完整评分 | 排序取 Top-N 返回 |
+| 精排 | `getCreatorPerformance` + 外部相似度服务 | TikTok ≤12 + 服务 1 次 | 以服务返回的分数和 breakdown 为准 | 排序取 Top-N 返回 |
 
 粗排 Top-K 计算：`K = min(ceil(top_n × 1.5), 12)`。
 
-## 二、6 个维度及权重（精排）
-
-| 维度 | 权重 | 相似度函数 | 数据字段 |
-|------|------|-----------|----------|
-| 品类匹配 | 0.25 | Jaccard（交集/并集） | `category_ids`（叶子 ID，两侧同层级可比） |
-| 粉丝量级 | 0.20 | `1 - \|log10(fA) - log10(fB)\| / 6` | `follower_count` |
-| GMV | 0.20 | `1 - \|A-B\| / max(A,B)` | `gmv.amount`（parseFloat） |
-| 互动率 | 0.15 | `1 - \|A-B\| / max(A,B)` | 见互动率取值规则 |
-| 客单价 | 0.10 | `1 - \|A-B\| / max(A,B)` | `gmv.amount / units_sold` |
-| 内容形式 | 0.10 | 匹配 = 1，否则 = 0 | 见内容形式推断规则 |
-
-### 品类匹配字段约束（关键）
+## 二、召回字段约束
 
 `search_creators` 的 `category` 参数只接受**顶层类目 ID**（`parent_id == "0"`），描述明文「禁止传更深层 ID」。
 - **召回用**：目标达人的 `category_gmv_distribution[].category_id`（顶级父类目 ID，与 `get_categories` 顶层 `id` 同级）。
-- **相似度计算用**：目标与候选的 `category_ids`（叶子 ID）做 Jaccard——两侧字段同层级，可比。
+- **候选粗排与展示标签用**：目标与候选的 `category_ids`（叶子 ID）做 Jaccard；该值不作为最终相似度。
 - **禁止混用**：不可将叶子 `category_ids` 传入 `searchCreators` 的 `parent_category_id`，否则被搜索接口静默忽略，返回无关达人。
 
-## 三、互动率取值规则
-
-先用 `inferContentFormat` 判断内容形式，再按形式取对应互动率：
-
-| 内容形式 | 互动率取值 |
-|----------|-----------|
-| 直播型 | `parseFloat(ec_live_engagement_rate) / 100` |
-| 视频型 | `parseFloat(ec_video_engagement_rate) / 100` |
-| 混合型 | 两者均值（缺失或为 "0" 的一侧不计入分母） |
-
-字段单位为**百分之一百分点**（如 `"6000"` = 60%），使用前 `/100` 换算为百分比值。
-缺失率记为 0，不参与均值时跳过。
-
-## 四、内容形式推断规则
-
-从 `ec_live_count` 和 `ec_video_count` 推断：
-
-| 条件 | 结果 |
-|------|------|
-| 两者均为 0 | `mixed` |
-| 直播占比 > 70% | `live` |
-| 视频占比 > 70% | `video` |
-| 其他 | `mixed` |
-
-## 五、3 路召回策略
+## 三、3 路召回策略
 
 | 召回路径 | 搜索参数 | 取前 | 触发条件 |
 |----------|---------|------|----------|
@@ -63,7 +37,7 @@
 
 各路结果合并 → 按 `creator_open_id` 去重 → 排除目标自身 → **上限 24 人**。
 
-## 六、粗排公式
+## 四、粗排公式
 
 仅用 `searchCreators` 已返回字段（品类 + 粉丝量），零额外 API 调用：
 
@@ -72,13 +46,13 @@ coarseScore = computeCategorySimilarity(targetCatIds, candidateCategoryIds) × (
             + computeFollowerSimilarity(targetFollowers, candidateFollowers) × (0.20/0.45)
 ```
 
-权重归一化至总和 1。
+权重归一化至总和 1。该分数只决定哪些候选进入外部评分，不能写入 `similarity_score`，也不能作为失败时的替代结果。
 
-## 七、差异化标签规则
+## 五、差异化标签规则
 
 | 标签 | 触发条件 |
 |------|---------|
-| 同品类 | 精排品类 Jaccard ≥ 0.8 |
+| 同品类 | 目标与候选的叶子品类 Jaccard ≥ 0.8 |
 | 更高GMV | 候选 GMV > 目标 × 1.2 |
 | 更高互动率 | 候选互动率 > 目标 × 1.2 |
 | 更大粉丝量 | 候选粉丝 > 目标 × 1.5 |

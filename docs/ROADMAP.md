@@ -4,8 +4,7 @@
 
 ## 已完成
 
-- [x] **多市场支持**: 在东南亚六国基础上先后新增美国（US）及英国（GB）、德国（DE）、意大利（IT）、法国（FR）、西班牙（ES）、爱尔兰（IE），由 Agent 统一维护 13 国市场边界，搜索 Skill 只引用该边界，并同步插件元数据与契约测试（2026-07-31 ~ 2026-08-27）。
-- [x] **相似达人推荐**: `find_similar_creators` MCP 工具（mcp-remote，含两阶段评分 + 3 路召回 + 6 维加权相似度 + 单元测试）+ `tiktok-similar-creators` Skill（creator-outreach，含 Reference 相似度模型文档），以局部限流缓解的 MVP 口径上线；全局限流保护后续补全（2026-08-02）。
+- [x] **相似达人推荐**: `find_similar_creators` MCP 工具（mcp-remote，含三路召回、候选预算和外部双达人相似度服务唯一评分）+ `tiktok-similar-creators` Skill（creator-outreach，含置信度与展示契约）；没有有效外部评分时返回错误，不提供本地评分替代（2026-08-02 ~ 2026-09-03）。
 - [x] **已废弃宿主残留清理**: 删除安装测试中的废弃宿主兼容断言，并把 ROADMAP / CHANGELOG 中仍显式提及旧宿主的历史文案收敛为仅描述 WorkBuddy 路径，避免对当前读者暴露已废弃宿主（2026-07-21）。
 - [x] **WorkBuddy 公开自助安装与持续升级闭环**: 将分享链接后的会话收敛为四状态 bootstrap 门禁，首次确认后预拉取并自检 `mcp-server@latest`、原子合并 WorkBuddy MCP 配置，后续按 24 小时周期静默更新 creator-outreach；Windows 托管运行时通过 `node.exe` 直接加载 npm CLI，并自动迁移旧 `.cmd` / `.bat` 和过期运行时路径（2026-07-21 ~ 2026-07-22）。
 - [x] **文档权威来源与客户端支持收敛**: 将 Agent 收敛为共享行为与跨 Skill 编排来源，Skills 分别维护搜索、分析和建联专项契约，References 维护评分公式、字段映射和话术模板；保留并标注非权威 Python 参考实现，包内文档收敛为产品/架构说明，客户端仅支持 WorkBuddy（2026-07-21 ~ 2026-07-22）。
