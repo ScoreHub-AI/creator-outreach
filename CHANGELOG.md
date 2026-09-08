@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## 1.8.0
+
+### Minor Changes
+
+- Use the external creator similarity service as the only final scorer for similar-creator recommendations and report structured service failures.
+
 ## 1.7.0
 
 ### Added
