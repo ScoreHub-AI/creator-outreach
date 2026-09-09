@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## 1.8.1
+
+### Patch Changes
+
+- Fix WorkBuddy restart state recovery after MCP reload
+
 ## Unreleased
 
 ### Fixed
