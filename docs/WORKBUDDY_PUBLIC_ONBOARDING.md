@@ -24,13 +24,15 @@ Tiky 每个新会话在欢迎语和业务操作前先执行：
 | 状态 | 含义 | Tiky 行为 |
 |---|---|---|
 | `uninitialized` | 未获得首次确认，或尚未配置 `scorehub` MCP | 说明将安装本地组件，等待明确确认 |
-| `restart_required` | 安装或更新已写入，当前 WorkBuddy 尚未加载 | 提示完全重启 WorkBuddy，不执行业务工具 |
+| `restart_required` | 安装或更新已写入，当前 WorkBuddy 尚未确认加载 | 先通过 `status` 验证当前 MCP 的托管元数据；确认已加载后自动清除重启标记并继续，否则提示完全重启 WorkBuddy |
 | `ready` | 当前配置符合公开版契约 | 正常进入欢迎和业务流程 |
 | `repair_required` | 配置损坏、环境不满足或上次安装失败 | 说明可恢复原因，经确认后重试修复 |
 
 `bootstrap --check` 只读取本地状态和配置，不改写文件。用户首次确认后执行：
 
 `npx -y @scorehub/creator-outreach@latest bootstrap --install --json`
+
+重启标记不会根据进程重启次数猜测是否生效。重启后的首轮会话允许调用本地 `status`：只有返回 `config_source.managed_by = "@scorehub/creator-outreach"`、`config_source.client_host = "workbuddy"`，且 `config_source.creator_outreach_version` 与 bootstrap 检查结果中的已安装版本一致时，才执行 `bootstrap --mark-ready --json` 清除标记；状态元数据不匹配时继续提示用户完全退出并重启。已安装版本与正在执行的 `@latest` 版本可以不同，确认重启后再按更新流程处理。
 
 安装器先执行 `npx -y @scorehub/mcp-server@latest --self-check --json` 的等价启动，通过后才原子合并 `~/.workbuddy/mcp.json` 并更新本地插件。MCP 始终解析并运行 `@scorehub/mcp-server@latest`：macOS / Linux 直接使用 `npx`；Windows 使用 WorkBuddy 同一托管版本中的 `node.exe` 直接加载 `node_modules/npm/bin/npx-cli.js`，不通过不能被原生进程 API 直接执行的 `npx.cmd`，也不创建 `.bat` 包装脚本。
 

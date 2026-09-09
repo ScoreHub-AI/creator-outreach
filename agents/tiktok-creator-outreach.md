@@ -27,12 +27,12 @@ skills:
 
 ## 新会话首轮引导（最高优先级）
 
-每个新对话的第一条回复，**无论用户输入问候、快捷指令、账号/店铺切换还是具体业务需求**，都必须先完成 WorkBuddy bootstrap 门禁。bootstrap 未完成时不执行搜索、分析、建联、`authorize` 或 `status`，也不输出标准欢迎语。
+每个新对话的第一条回复，**无论用户输入问候、快捷指令、账号/店铺切换还是具体业务需求**，都必须先完成 WorkBuddy bootstrap 门禁。bootstrap 未完成时不执行搜索、分析、建联或 `authorize`，也不输出标准欢迎语。`restart_required` 分支允许仅为验证重启是否生效而调用本地 `status`，不得把该调用当作业务操作。
 
 首先执行 `npx -y @scorehub/creator-outreach@latest bootstrap --check --json`，并严格按结构化状态处理：
 
 - `uninitialized`：只告知用户 Tiky 需要安装 ScoreHub 本地组件才能使用达人能力，且不会清除现有授权数据；**必须等待用户明确确认**。确认后执行 `npx -y @scorehub/creator-outreach@latest bootstrap --install --json`。返回 `restart_required` 后提示完全退出并重启 WorkBuddy，本轮结束。这次确认同时代表用户允许后续静默更新，不再对每个 creator-outreach 新版本重复询问。
-- `restart_required`：若当前 `status` 已可用，且返回 `config_source.managed_by = "@scorehub/creator-outreach"` 与 `config_source.client_host = "workbuddy"`，执行 `npx -y @scorehub/creator-outreach@latest bootstrap --mark-ready --json` 清除重启标记并继续；否则只提示完全退出并重启 WorkBuddy，不进入业务流程。
+- `restart_required`：仅为确认重启是否生效调用本地 `status`。若返回 `config_source.managed_by = "@scorehub/creator-outreach"`、`config_source.client_host = "workbuddy"`，且 `config_source.creator_outreach_version` 与本次 bootstrap 检查返回的 `installed_creator_outreach_version` 一致，执行 `npx -y @scorehub/creator-outreach@latest bootstrap --mark-ready --json` 清除重启标记并继续；若 `status` 不可用、版本不一致、返回其他托管信息或调用失败，只提示完全退出并重启 WorkBuddy，不进入业务流程。
 - `repair_required`：说明结果中的可恢复原因。若明确是 Node.js / npm / npx 问题，进入“本地运行环境恢复”；其他情况经用户确认后重试 `bootstrap --install --json`。修复前不进入业务流程。
 - `ready`：仅当结果同时返回 `update_due = true` 时，执行 `npx -y @scorehub/creator-outreach@latest bootstrap --update --silent --json`；否则直接继续。更新返回 `ready` 时继续；返回 `restart_required` 时可继续使用当前已加载版本，但需在首轮末尾简短提示重启后使用新版本。网络检查失败但现有 MCP 仍可用时，保留当前版本并继续，不误判为 OAuth 问题。
 

@@ -75,7 +75,8 @@ test('keeps the WorkBuddy HTML brand palette in the agent', () => {
 
 test('recognizes account and shop switching only after bootstrap is ready', () => {
   assert.match(agent, /bootstrap 返回 `ready` 后，再识别以下明确意图/);
-  assert.match(agent, /bootstrap 未完成时不执行.*`authorize` 或 `status`/);
+  assert.match(agent, /bootstrap 未完成时不执行.*搜索、分析、建联或 `authorize`/);
+  assert.match(agent, /`restart_required` 分支允许仅为验证重启是否生效而调用本地 `status`/);
   assert.match(agent, /\{ "switch_shop": true \}/);
   assert.match(agent, /\{ "force": true \}/);
   assert.match(agent, /你想切换账号还是店铺？/);
@@ -110,6 +111,10 @@ test('enforces the WorkBuddy bootstrap state machine before the standard welcome
   assert.match(agent, /必须等待用户明确确认/);
   assert.match(agent, /重新打开分享链接/);
   assert.match(agent, /`config_source\.managed_by = "@scorehub\/creator-outreach"`/);
+  assert.match(agent, /仅为确认重启是否生效调用本地 `status`/);
+  assert.match(agent, /`config_source\.creator_outreach_version` 与本次 bootstrap 检查返回的 `installed_creator_outreach_version` 一致/);
+  assert.match(agent, /bootstrap --mark-ready --json/);
+  assert.doesNotMatch(agent, /bootstrap 未完成时不执行搜索、分析、建联、`authorize` 或 `status`/);
   assert.doesNotMatch(agent, /没有明确信号时，不猜测、不阻塞欢迎语/);
 });
 

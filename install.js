@@ -316,6 +316,7 @@ function check({
     status: detected.status,
     reason: detected.reason,
     creator_outreach_version: pkg.version,
+    installed_creator_outreach_version: state.creator_outreach_version,
     consent_granted: state.consent_granted,
     mcp_configured: detected.status === 'ready' || detected.status === 'restart_required',
     restart_required: state.restart_required,

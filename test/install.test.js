@@ -99,6 +99,7 @@ test('installs the plugin and always configures mcp-server latest', () => {
   assert.equal(state.consent_granted, true);
   assert.equal(state.observed_mcp_server_version, '0.3.4');
   assert.equal(state.restart_required, true);
+  assert.equal(check({ homeDir }).installed_creator_outreach_version, require('../package.json').version);
   assert.equal(manifest.version, require('../package.json').version);
 });
 

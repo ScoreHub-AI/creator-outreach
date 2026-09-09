@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## Unreleased
+
+### Fixed
+
+- Allow the WorkBuddy bootstrap gate to verify the restarted MCP process with `status` and clear `restart_required` when the loaded managed configuration matches the installed plugin version.
+
 ## 1.8.0
 
 ### Minor Changes
