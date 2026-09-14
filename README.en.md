@@ -23,7 +23,7 @@ For the public release, end users only need to:
 
    `https://www.workbuddy.cn/work/launch/?sharecode=lNM8H05BRKoV-dw2gac3ZwQ-p01o3C3KVz1gXJ_CwvtX02-mSRqBB3xepE4V0gr7&expertname=Tiky+%C2%B7+TikTok%E8%BE%BE%E4%BA%BA%E8%90%A5%E9%94%80%E4%B8%93%E5%AE%B6&buddy_type=workbuddy`
 
-3. Return to WorkBuddy and open the “Tiky · TikTok Creator Marketing Expert” conversation
+3. Return to WorkBuddy and open the “ScoreHub Tiky” conversation
 
 Tiky uses `npx -y @scorehub/creator-outreach@latest` to run a bootstrap check before every new conversation. When the machine is uninitialized, Tiky explains that the ScoreHub local component is required and waits for explicit confirmation. It then prefetches and self-checks `@scorehub/mcp-server@latest` before updating Tiky's files and the WorkBuddy `scorehub` MCP configuration. WorkBuddy must be fully restarted after the initial installation.
 
@@ -43,7 +43,7 @@ The installer configures WorkBuddy only. If it does not find WorkBuddy, it exits
 
 | Client | Detection | Installed content | How to use |
 |---|---|---|---|
-| WorkBuddy | `~/.workbuddy/` exists | Plugin files in `~/.workbuddy/plugins/.../`; MCP configuration merged into `~/.workbuddy/mcp.json` | Restart, then select “ScoreHub AI TikTok Creator Marketing Expert” from the Agent list |
+| WorkBuddy | `~/.workbuddy/` exists | Plugin files in `~/.workbuddy/plugins/.../`; MCP configuration merged into `~/.workbuddy/mcp.json` | Restart, then select “ScoreHub Tiky” from the Agent list |
 
 Before writing the configuration, Tiky verifies the MCP server with `--self-check --json`, then WorkBuddy starts it automatically. macOS and Linux use `npx -y @scorehub/mcp-server@latest`. Windows reuses WorkBuddy's managed `node.exe` to load the matching npm `npx-cli.js` directly, avoiding `.cmd` / `.bat` process-launch compatibility problems. Tiky only guides users to the official Node.js LTS installer when the managed runtime is explicitly missing or too old.
 

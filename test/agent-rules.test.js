@@ -1,7 +1,9 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
+const { execFileSync, spawnSync } = require('node:child_process');
 
 const agentPath = path.join(__dirname, '..', 'agents', 'tiktok-creator-outreach.md');
 const agent = fs.readFileSync(agentPath, 'utf8');
@@ -225,7 +227,12 @@ test('keeps the 13-country market boundary authoritative in the agent', () => {
   assert.match(searchSkill, /支持市场 allowlist.*以 Agent.*唯一权威来源/);
   assert.doesNotMatch(searchSkill, /\| 国家 \| 代码 \|/);
   assert.match(pluginJson.description, /13 markets.*Southeast Asia.*United States.*Europe/);
-  assert.ok(pluginJson.tags.some((tag) => tag.en === 'Europe' && tag.zh === '欧洲'));
+  // 官方字段表要求 tags 固定 3 个，市场覆盖改由 description 承载（见上一行断言）
+  assert.equal(pluginJson.tags.length, 3);
+  for (const tag of pluginJson.tags) {
+    assert.match(tag.en, /\S/);
+    assert.match(tag.zh, /\S/);
+  }
   assert.match(packageReadme, /当前覆盖 13 个国家市场/);
   assert.match(packageReadmeEn, /currently covers 13 country markets/);
   assert.match(brochure, /13 个国家市场协同/);
@@ -482,18 +489,62 @@ test('keeps the WorkBuddy plugin version aligned with the npm package', () => {
 });
 
 test('keeps ScoreHub AI as the master brand and Tiky as the named expert agent', () => {
-  const displayName = 'ScoreHub AI TikTok达人营销专家';
-  const profession = 'Tiky · TikTok达人营销专家';
+  const displayName = 'ScoreHub Tiky';
+  const profession = 'TikTok 达人营销专家';
 
   assert.equal(pluginJson.displayName.zh, displayName);
   assert.equal(pluginJson.profession.zh, profession);
-  assert.match(pluginJson.displayDescription.zh, /Tiky 是 ScoreHub AI 打造的 TikTok 达人营销专家/);
-  assert.match(pluginJson.displayDescription.zh, /建立清晰准确的达人画像/);
-  assert.match(pluginJson.displayDescription.zh, /小范围建联快速验证/);
+  // 平台表单实测上限：专家名称 15 字（“专家名称：当前 24 字，上限 15 字”）。中英文两侧同限。
+  for (const lang of ['zh', 'en']) {
+    assert.ok(
+      pluginJson.displayName[lang].length <= 15,
+      `displayName.${lang} 为 ${pluginJson.displayName[lang].length} 字，超过平台 15 字上限`,
+    );
+  }
+  assert.match(pluginJson.displayDescription.zh, /Tiky 是 ScoreHub AI/);
+  assert.match(pluginJson.displayDescription.zh, /TikTok 达人营销专家/);
+  assert.match(pluginJson.displayDescription.zh, /达人画像/);
+  assert.match(pluginJson.displayDescription.zh, /小范围建联验证/);
+  // 官方字段表要求 displayDescription 中文 40–50 字；口径按全字符数计（含拉丁字符与标点）
+  const zhLength = pluginJson.displayDescription.zh.length;
+  assert.ok(zhLength >= 40 && zhLength <= 50, `displayDescription.zh 为 ${zhLength} 字，需落在 40–50 字`);
   assert.match(agent, new RegExp(displayName.replace('·', '\\·')));
   assert.match(agent, new RegExp(profession.replace('·', '\\·')));
   assert.match(agent, /我是 Tiky，ScoreHub AI 的 TikTok 达人营销专家/);
   assert.match(agent, /不是海量群发工具/);
   assert.match(agent, /不会把向成千上万位达人发消息作为交付目标/);
   assert.doesNotMatch(agent, /TikTok达人建联专家|Tiky by ScoreHub AI/);
+});
+
+// 反向断言：权威正文保留分享链接安装路径所需的 bootstrap 门禁，而开放平台上架版必须剥离它，
+// 且剥离后不得改动任何领域契约。上架版由 scripts/build-platform-agent.py 生成，不手工维护第二份正文。
+test('keeps the open-platform listing agent free of the share-link bootstrap path', (t) => {
+  if (spawnSync('python3', ['--version'], { stdio: 'ignore' }).status !== 0) {
+    t.skip('python3 不可用');
+    return;
+  }
+  const builderPath = path.join(__dirname, '..', 'scripts', 'build-platform-agent.py');
+  const outPath = path.join(os.tmpdir(), `tiky-platform-agent-${process.pid}.md`);
+  try {
+    execFileSync('python3', [builderPath, agentPath, outPath], { stdio: 'pipe' });
+    const variant = fs.readFileSync(outPath, 'utf8');
+
+    assert.doesNotMatch(variant, /bootstrap|sharecode|creator-outreach@latest|分享链接/i);
+    assert.match(variant, /由 WorkBuddy 的依赖引导卡片负责/);
+
+    // 领域契约与非安装类业务规则必须原样保留
+    assert.match(variant, /不是海量群发工具/);
+    assert.match(variant, /`switch_shop`/);
+    assert.match(variant, /ScoreHub 服务暂时未连接/);
+    for (const skill of [
+      'tiktok-creator-search',
+      'tiktok-creator-analysis',
+      'tiktok-batch-outreach',
+      'tiktok-similar-creators',
+    ]) {
+      assert.match(variant, new RegExp(skill));
+    }
+  } finally {
+    fs.rmSync(outPath, { force: true });
+  }
 });

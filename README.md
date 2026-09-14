@@ -23,7 +23,7 @@ Tiky 当前覆盖 13 个国家市场：印度尼西亚（ID）、泰国（TH）�
 
    `https://www.workbuddy.cn/work/launch/?sharecode=lNM8H05BRKoV-dw2gac3ZwQ-p01o3C3KVz1gXJ_CwvtX02-mSRqBB3xepE4V0gr7&expertname=Tiky+%C2%B7+TikTok%E8%BE%BE%E4%BA%BA%E8%90%A5%E9%94%80%E4%B8%93%E5%AE%B6&buddy_type=workbuddy`
 
-3. 回到 WorkBuddy，打开 “Tiky · TikTok达人营销专家” 对话
+3. 回到 WorkBuddy，打开 “ScoreHub Tiky” 对话
 
 Tiky 每个新会话都会通过 `npx -y @scorehub/creator-outreach@latest` 执行 bootstrap 检查。未初始化时，她会说明需要安装 ScoreHub 本地组件，并等待你明确确认；确认后预拉取并自检 `@scorehub/mcp-server@latest`，再更新 Tiky 本地文件和 WorkBuddy 的 `scorehub` MCP 配置。安装完成后需要完全重启 WorkBuddy。
 
@@ -43,7 +43,7 @@ npx -y @scorehub/creator-outreach
 
 | 客户端 | 检测条件 | 安装内容 | 使用方式 |
 |---|---|---|---|
-| WorkBuddy | `~/.workbuddy/` 存在 | 插件文件写入 `~/.workbuddy/plugins/.../`；MCP 配置合并到 `~/.workbuddy/mcp.json` | 重启后在 Agent 列表选择“ScoreHub AI TikTok达人营销专家” |
+| WorkBuddy | `~/.workbuddy/` 存在 | 插件文件写入 `~/.workbuddy/plugins/.../`；MCP 配置合并到 `~/.workbuddy/mcp.json` | 重启后在 Agent 列表选择“ScoreHub Tiky” |
 
 MCP Server（`@scorehub/mcp-server`）在写入配置前会先通过 `--self-check --json` 验证可执行性，之后由 WorkBuddy 自动拉起。macOS / Linux 使用 `npx -y @scorehub/mcp-server@latest`；Windows 复用 WorkBuddy 托管的 `node.exe` 直接加载同版本 npm 的 `npx-cli.js`，避免 `.cmd` / `.bat` 的进程启动兼容问题。只有在托管运行时明确缺失或版本过低时，Tiky 才会引导你安装官方 Node.js LTS。
 

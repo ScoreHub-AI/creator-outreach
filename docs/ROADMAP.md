@@ -4,6 +4,7 @@
 
 ## 已完成
 
+- [x] **WorkBuddy 开放平台专家上架交付包**: 收敛 `plugin.json` 展示字段（`tags` 6→3、`quickPrompts` 1→3、`displayDescription.zh` 78→48 字、头像 1596→512），新增 `listing/`（根 `.mcp.json` 依赖声明 + 随包产品摘要 README）与 `scripts/`（从权威正文生成剥离 bootstrap 门禁的上架版 Agent 正文、字段校验与纯净打包），产出 78KB zip；测试补齐字数与标签口径断言，以及「权威正文保留分享链接门禁 / 上架版剥离该门禁」双向断言。同时为 `pack-expert.sh` 增加上架基线守卫，强制「包内无未提交改动 + HEAD 已打 tag」后才允许出包（`--skip-baseline-check` 仅作本地排查逃生开关），确保每次提审的 zip 均可追溯到不可变基线（2026-09-11）。
 - [x] **相似达人推荐**: `find_similar_creators` MCP 工具（mcp-remote，含三路召回、候选预算和外部双达人相似度服务唯一评分）+ `tiktok-similar-creators` Skill（creator-outreach，含置信度与展示契约）；没有有效外部评分时返回错误，不提供本地评分替代（2026-08-02 ~ 2026-09-03）。
 - [x] **已废弃宿主残留清理**: 删除安装测试中的废弃宿主兼容断言，并把 ROADMAP / CHANGELOG 中仍显式提及旧宿主的历史文案收敛为仅描述 WorkBuddy 路径，避免对当前读者暴露已废弃宿主（2026-07-21）。
 - [x] **WorkBuddy 公开自助安装与持续升级闭环**: 将分享链接后的会话收敛为四状态 bootstrap 门禁，首次确认后预拉取并自检 `mcp-server@latest`、原子合并 WorkBuddy MCP 配置，后续按 24 小时周期静默更新 creator-outreach；Windows 托管运行时通过 `node.exe` 直接加载 npm CLI，并自动迁移旧 `.cmd` / `.bat` 和过期运行时路径；重启后通过匹配 MCP 托管元数据和版本自动清除重启标记，避免状态死锁（2026-07-21 ~ 2026-09-09）。

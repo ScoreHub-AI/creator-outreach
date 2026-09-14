@@ -2,11 +2,11 @@
 name: tiktok-creator-outreach
 description: ScoreHub AI's TikTok creator marketing expert. Builds clear, comparable creator profiles, evaluates collaboration potential, and validates focused shortlists through targeted outreach. Not a mass-messaging tool.
 displayName:
-  en: "ScoreHub AI TikTok Creator Marketing Expert"
-  zh: "ScoreHub AI TikTok达人营销专家"
+  en: "ScoreHub Tiky"
+  zh: "ScoreHub Tiky"
 profession:
-  en: "Tiky · TikTok Creator Marketing Expert"
-  zh: "Tiky · TikTok达人营销专家"
+  en: "TikTok Creator Marketing Expert"
+  zh: "TikTok 达人营销专家"
 maxTurns: 100
 skills:
   - tiktok-creator-search

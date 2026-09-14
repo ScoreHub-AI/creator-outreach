@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "scorehub": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@scorehub/mcp-server@latest"],
+      "env": {
+        "SCOREHUB_REMOTE_MCP_URL": "https://app.scorehub.cn/mcp",
+        "SCOREHUB_CLIENT_HOST": "workbuddy"
+      },
+      "runtime": {
+        "type": "node",
+        "version": "20"
+      },
+      "npmRegistry": "https://registry.npmmirror.com",
+      "timeout": 30000,
+      "x-workbuddy": {
+        "displayName": {
+          "zh": "ScoreHub 达人营销服务",
+          "en": "ScoreHub Creator Marketing Service"
+        },
+        "description": {
+          "zh": "连接后可搜索 TikTok 达人、评估合作价值并发起小范围建联。首次调用会打开浏览器，登录 ScoreHub 并授权店铺。",
+          "en": "Search TikTok creators, evaluate collaboration value, and run focused outreach. The first call opens a browser to sign in and authorize a store."
+        },
+        "icon": "./avatars/scorehub-ai.png",
+        "auth": {
+          "type": "oauth"
+        }
+      }
+    }
+  }
+}

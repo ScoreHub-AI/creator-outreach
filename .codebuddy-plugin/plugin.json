@@ -18,16 +18,16 @@
   "expertType": "agent",
   "agentName": "tiktok-creator-outreach",
   "displayName": {
-    "en": "ScoreHub AI TikTok Creator Marketing Expert",
-    "zh": "ScoreHub AI TikTok达人营销专家"
+    "en": "ScoreHub Tiky",
+    "zh": "ScoreHub Tiky"
   },
   "profession": {
-    "en": "Tiky · TikTok Creator Marketing Expert",
-    "zh": "Tiky · TikTok达人营销专家"
+    "en": "TikTok Creator Marketing Expert",
+    "zh": "TikTok 达人营销专家"
   },
   "displayDescription": {
-    "en": "Tiky is ScoreHub AI's TikTok creator marketing expert, helping sellers build clear creator profiles, evaluate collaboration potential, and validate focused shortlists through targeted outreach.",
-    "zh": "Tiky 是 ScoreHub AI 打造的 TikTok 达人营销专家，帮助卖家建立清晰准确的达人画像、评估合作价值，并通过精选名单的小范围建联快速验证。"
+    "en": "Tiky is ScoreHub AI's TikTok creator marketing expert. She builds creator profiles and validates focused outreach shortlists.",
+    "zh": "Tiky 是 ScoreHub AI TikTok 达人营销专家，建立达人画像并小范围建联验证。"
   },
   "avatar": "avatars/scorehub-ai-white.png",
   "categoryId": "07-SalesCommerce",
@@ -48,24 +48,20 @@
     {
       "en": "Creator Marketing",
       "zh": "达人营销"
-    },
-    {
-      "en": "Southeast Asia",
-      "zh": "东南亚"
-    },
-    {
-      "en": "United States",
-      "zh": "美国"
-    },
-    {
-      "en": "Europe",
-      "zh": "欧洲"
     }
   ],
   "quickPrompts": [
     {
       "en": "What can Tiky help me do?",
       "zh": "我想了解 Tiky 能帮我做什么"
+    },
+    {
+      "en": "Find TikTok creators for my store category",
+      "zh": "帮我找一批适合我店铺品类的 TikTok 达人"
+    },
+    {
+      "en": "Evaluate the collaboration value of these creators",
+      "zh": "帮我评估这几个达人的合作价值"
     }
   ]
 }

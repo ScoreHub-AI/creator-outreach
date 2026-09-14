@@ -1,6 +1,6 @@
 # creator-outreach — 产品与协作文档
 
-> **实现状态**: 当前已实现 Agent 定义、WorkBuddy 插件清单、三个 Skill、Rank 分数契约与消息模板参考、`create_conversation` 建联链路、账号与店铺切换，以及搜索/评分的固定 Markdown 与 WorkBuddy HTML 输出能力。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
+> **实现状态**: 当前已实现 Agent 定义、WorkBuddy 插件清单、四个 Skill、Rank 分数契约与消息模板参考、`create_conversation` 建联链路、账号与店铺切换、搜索/评分的固定 Markdown 与 WorkBuddy HTML 输出能力，以及 WorkBuddy 开放平台上架素材包（`listing/` + `scripts/`）。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
 
 ## 文档权威来源
 
@@ -13,6 +13,7 @@
   - [`../skills/tiktok-creator-search/SKILL.md`](../skills/tiktok-creator-search/SKILL.md)
   - [`../skills/tiktok-creator-analysis/SKILL.md`](../skills/tiktok-creator-analysis/SKILL.md)
   - [`../skills/tiktok-batch-outreach/SKILL.md`](../skills/tiktok-batch-outreach/SKILL.md)
+  - [`../skills/tiktok-similar-creators/SKILL.md`](../skills/tiktok-similar-creators/SKILL.md)
   - 各自领域特有的触发条件、输入输出契约和关键陷阱的权威来源
 - **Reference 细节规则**：
   - 搜索筛选字段、自然语言映射、取值范围与互斥关系以 [`../skills/tiktok-creator-search/references/creator-search-filters.md`](../skills/tiktok-creator-search/references/creator-search-filters.md) 为准
@@ -26,6 +27,10 @@
 - **公开发布与自助安装说明**：
   - [`./WORKBUDDY_PUBLIC_ONBOARDING.md`](./WORKBUDDY_PUBLIC_ONBOARDING.md)
   - 面向终端用户的分享链接首装、Tiky 自升级、`mcp-server` 引导和环境恢复口径
+- **开放平台上架素材与交付口径**：
+  - [`../listing/README.md`](../listing/README.md) 是随上架 zip 分发的产品摘要，不含本地安装命令
+  - [`../listing/.mcp.json`](../listing/.mcp.json) 是平台依赖声明（自包含 MCP，server key `scorehub`）
+  - [`../scripts/`](../scripts) 负责生成上架版 Agent 正文与打包，字段契约、打包清单与未完成项以顶层 [`../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md`](../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md) 为准
 
 若不同文档表述不一致，共享行为以 Agent 为准，领域专项行为以对应 Skill 为准，字段、边界和模板细节以对应 Reference 为准。
 
@@ -48,6 +53,7 @@ Tiky 是 ScoreHub AI 面向 TikTok Shop 卖家的达人营销专家。其核心�
 - **插件元数据**：WorkBuddy 插件清单、展示名、头像、快捷入口
 - **安装器**：将插件复制到 WorkBuddy，并写入 `@scorehub/mcp-server` 的 MCP 配置
 - **公开版引导**：在 WorkBuddy 每个新会话强制执行 bootstrap 状态门禁，首次确认后预拉取并自检 `mcp-server@latest`，后续静默更新 creator-outreach，并仅在明确证据下恢复 Node.js LTS
+- **开放平台上架素材**：上架版 Agent 正文（剥离分享链接专用门禁，由脚本从权威正文生成）、平台依赖声明 `.mcp.json`、随包产品摘要 README，以及字段校验与纯净打包脚本
 - **测试**：校验品牌、安装行为以及关键规范是否仍由正确文档承载
 
 本包不承担以下职责：
@@ -138,4 +144,5 @@ TikTok Shop Partner API
 - 修改某个能力的专属规则时，只改对应 Skill
 - 修改 Rank 分数映射、字段边界或话术模板时，只改对应 Reference；Skill 只在引用关系或对外能力变化时同步更新
 - 修改安装、首次使用或故障排查口径时，更新包级 README
+- 修改上架版 Agent 行为时，改 `scripts/build-platform-agent.py` 的锚点替换对，不要手工维护第二份正文；字段合规与打包清单变更以顶层上架方案文档为准
 - 新增开发主题时，先更新本包 [ROADMAP.md](./ROADMAP.md)，完成后再同步顶层 `docs/ROADMAP.md`

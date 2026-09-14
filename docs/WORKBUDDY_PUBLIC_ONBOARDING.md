@@ -1,6 +1,8 @@
 # WorkBuddy 公开自助安装与持续升级
 
 > 本文档定义 `creator-outreach` 面向终端用户的公开交付路径。具体对话行为以 Agent 权威规范为准。
+>
+> **交付路径边界**：本文只描述**分享链接**路径。**开放平台**（`open.workbuddy.cn`）上架走 WorkBuddy 依赖引导卡片，MCP 由平台负责连接，**不含**本页的 bootstrap 门禁与分享链接回退；其字段契约、上架版 Agent 正文差异与交付物见顶层 [`../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md`](../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md)。
 
 ## 交付边界
 
