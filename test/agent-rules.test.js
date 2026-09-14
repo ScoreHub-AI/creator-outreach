@@ -548,3 +548,64 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
     fs.rmSync(outPath, { force: true });
   }
 });
+
+test('documents the activation_required state as a fifth bootstrap branch', () => {
+  assert.match(onboardingDoc, /\| `activation_required` \|/);
+  assert.match(onboardingDoc, /重启 WorkBuddy 对 `activation_required` 无效/);
+  assert.match(onboardingDoc, /installed_plugins\.json/);
+  assert.match(onboardingDoc, /versionSatisfiesRange|版本区间/);
+});
+
+test('documents the platform and dev channels as separate deliverables', () => {
+  // 两条通道的分工是唯一权威描述，缺任何一条都会让「用户跑旧代码」重新变成谜题。
+  assert.match(onboardingDoc, /## 两条通道的分工/);
+  assert.match(onboardingDoc, /tiktok-creator-outreach-dev/);
+  assert.match(onboardingDoc, /bootstrap --dev/);
+  assert.match(onboardingDoc, /enabledPlugins/);
+  assert.match(onboardingDoc, /doScanCustomExperts/);
+  assert.match(onboardingDoc, /agentName/);
+  // skill id 隔离是两条通道能共存的前提。
+  assert.match(onboardingDoc, /applyDevSkillIds/);
+  // 自测副本的代码来源必须登记：否则来自 npm 发布包的静默更新会覆盖未发布的改动。
+  assert.match(onboardingDoc, /sourceDir/);
+  assert.match(onboardingDoc, /local_channel_source_dir/);
+  assert.doesNotMatch(onboardingDoc, /三条硬约束/);
+});
+
+test('records that enabledPlugins is not a load gate', () => {
+  // 曾经把 enabledPlugins=false 当成「副本完全不加载」，本机日志证明不成立（两侧 false 却都 Loaded）。
+  // 这条断言防止把错误结论写回文档，也防止把那句「只启用一条通道」的旧隔离说法带回来。
+  assert.match(onboardingDoc, /拦不住加载/);
+  assert.doesNotMatch(onboardingDoc, /残留的 `false` 会让副本完全不加载/);
+  assert.doesNotMatch(onboardingDoc, /同一时间只启用一条通道/);
+});
+
+test('documents the legacy same-named local copy and its cleanup', () => {
+  assert.match(onboardingDoc, /cleanupLegacyLocalCopy/);
+  assert.match(onboardingDoc, /tiktok-creator-outreach@my-experts/);
+  assert.match(onboardingDoc, /同时\*\*加载同名技能/);
+});
+
+test('self-heals the dev channel instead of sending users to the plugin manager', () => {
+  assert.match(agent, /bootstrap --update --json/);
+  assert.match(agent, /不得提示用户去插件管理页点「更新」/);
+  assert.doesNotMatch(agent, /指引其打开 WorkBuddy 插件管理页对 Tiky 点「更新」/);
+});
+
+test('keeps the platform listing body free of every share-link bootstrap branch', () => {
+  const outputPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'platform-agent-')), 'agent.md');
+  const runner = process.env.PYTHON || 'python3';
+  const result = spawnSync(
+    runner,
+    [path.join(__dirname, '..', 'scripts', 'build-platform-agent.py'), agentPath, outputPath],
+    { encoding: 'utf8' },
+  );
+
+  if (result.error && result.error.code === 'ENOENT') return;
+
+  assert.equal(result.status, 0, result.stderr);
+  const platformAgent = fs.readFileSync(outputPath, 'utf8');
+  for (const token of ['bootstrap', 'sharecode', 'activation_required', 'restart_required']) {
+    assert.doesNotMatch(platformAgent, new RegExp(token));
+  }
+});

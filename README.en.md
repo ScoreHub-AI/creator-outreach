@@ -43,13 +43,31 @@ The installer configures WorkBuddy only. If it does not find WorkBuddy, it exits
 
 | Client | Detection | Installed content | How to use |
 |---|---|---|---|
-| WorkBuddy | `~/.workbuddy/` exists | Plugin files in `~/.workbuddy/plugins/.../`; MCP configuration merged into `~/.workbuddy/mcp.json` | Restart, then select “ScoreHub Tiky” from the Agent list |
+| WorkBuddy | `~/.workbuddy/` exists | Only the MCP configuration is merged into `~/.workbuddy/mcp.json` by default; `--dev` additionally writes a self-test plugin directory | Restart, then select “ScoreHub Tiky” from the Agent list |
 
 Before writing the configuration, Tiky verifies the MCP server with `--self-check --json`, then WorkBuddy starts it automatically. macOS and Linux use `npx -y @scorehub/mcp-server@latest`. Windows reuses WorkBuddy's managed `node.exe` to load the matching npm `npx-cli.js` directly, avoiding `.cmd` / `.bat` process-launch compatibility problems. Tiky only guides users to the official Node.js LTS installer when the managed runtime is explicitly missing or too old.
 
+## Two Delivery Channels
+
+| | Platform channel (end users) | Local self-test channel (developers) |
+|---|---|---|
+| Source | Listing package on the open platform, downloaded by WorkBuddy | This repository's source, written by `bootstrap --dev` |
+| Marketplace / plugin | `experts` / `tiktok-creator-outreach` | `my-experts` / `tiktok-creator-outreach-dev` |
+| Display name | ScoreHub Tiky | ScoreHub Tiky (local dev) |
+| Skill ids | `tiktok-creator-search`, etc. | The same ids with a `-dev` suffix |
+
+A default install (`bootstrap --install`) **only configures MCP** and never creates a second expert. Add `--dev` to register the local source as a self-test copy and validate new features before release. The self-test copy ships its own `-dev` skill ids, so the two channels no longer shadow each other when both are present — WorkBuddy resolves skills by name and silently skips duplicates, and the `enabledPlugins` flag does not stop loading, so distinct ids are the only reliable isolation.
+
+```bash
+# Self-test: write local source, register it under "My Experts", and advance the load position
+node packages/creator-outreach/install.js bootstrap --dev --install --json
+```
+
+`--dev` rewrites the versioned cache every time, so each run requires a full WorkBuddy restart to take effect. The self-test copy records its source root (this repository), so even a silent update triggered by the published npm package later refreshes it from that repository instead of overwriting your unpublished changes with release code. Disable or uninstall “ScoreHub Tiky (local dev)” on the plugin management page when you are done; both copies still share the same agent name, so disable the platform copy first if you ever see cross-talk. Installs and silent updates also clean up the legacy same-named `my-experts` copy left by older installers, which used to load duplicate skill names alongside the platform build.
+
 ## First Use and Authorization
 
-At the start of every new conversation, Tiky first checks one of four bootstrap states: `uninitialized`, `restart_required`, `ready`, or `repair_required`. Only `ready` permits the capability introduction, account or shop switching, and business operations. The first TikTok tool call then opens ScoreHub login when authorization is needed. After authorization, reauthorization, or a shop switch, Tiky confirms the login phone number, authorized shop, country, and bound brands. Tokens remain under `~/.scorehub/` and are not removed by bootstrap or updates.
+At the start of every new conversation, Tiky first checks one of five bootstrap states: `uninitialized`, `restart_required`, `activation_required`, `ready`, or `repair_required`. Only `ready` goes straight into the capability introduction, account or shop switching, and business operations; `activation_required` means the **local self-test copy** still loads an older version from the versioned cache (a restart does not help), so Tiky re-runs `bootstrap --update` and lets the installer advance the cache itself while the current turn continues with the loaded version — end users have no local self-test copy and never see this state. The first TikTok tool call then opens ScoreHub login when authorization is needed. After authorization, reauthorization, or a shop switch, Tiky confirms the login phone number, authorized shop, country, and bound brands. Tokens remain under `~/.scorehub/` and are not removed by bootstrap or updates.
 
 If Tiky says that the current shop's TikTok authorization is invalid or unavailable, your local ScoreHub login is usually still valid. Rebind the shop in ScoreHub and try again; do not repeat browser login.
 

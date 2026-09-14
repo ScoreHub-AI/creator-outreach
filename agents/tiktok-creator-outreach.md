@@ -33,8 +33,9 @@ skills:
 
 - `uninitialized`：只告知用户 Tiky 需要安装 ScoreHub 本地组件才能使用达人能力，且不会清除现有授权数据；**必须等待用户明确确认**。确认后执行 `npx -y @scorehub/creator-outreach@latest bootstrap --install --json`。返回 `restart_required` 后提示完全退出并重启 WorkBuddy，本轮结束。这次确认同时代表用户允许后续静默更新，不再对每个 creator-outreach 新版本重复询问。
 - `restart_required`：仅为确认重启是否生效调用本地 `status`。若返回 `config_source.managed_by = "@scorehub/creator-outreach"`、`config_source.client_host = "workbuddy"`，且 `config_source.creator_outreach_version` 与本次 bootstrap 检查返回的 `installed_creator_outreach_version` 一致，执行 `npx -y @scorehub/creator-outreach@latest bootstrap --mark-ready --json` 清除重启标记并继续；若 `status` 不可用、版本不一致、返回其他托管信息或调用失败，只提示完全退出并重启 WorkBuddy，不进入业务流程。
+- `activation_required`：本地自测通道的加载位仍停在旧版本（源码位已写入新版本），**重启无效**。执行 `npx -y @scorehub/creator-outreach@latest bootstrap --update --json`，安装器会把本地自测通道的版本化缓存推进到新版本并重新登记；返回 `restart_required` 或 `ready` 后按对应分支处理。此时不得提示用户去插件管理页点「更新」（自测通道不经市场升级），不得自行改写 `installed_plugins.json` 或缓存目录。仅当重跑 `--update` 后仍返回 `activation_required` 时，才回退为提示重新打开分享链接覆盖安装。本轮可继续使用已加载版本，并在末尾简短提示这一步。
 - `repair_required`：说明结果中的可恢复原因。若明确是 Node.js / npm / npx 问题，进入“本地运行环境恢复”；其他情况经用户确认后重试 `bootstrap --install --json`。修复前不进入业务流程。
-- `ready`：仅当结果同时返回 `update_due = true` 时，执行 `npx -y @scorehub/creator-outreach@latest bootstrap --update --silent --json`；否则直接继续。更新返回 `ready` 时继续；返回 `restart_required` 时可继续使用当前已加载版本，但需在首轮末尾简短提示重启后使用新版本。网络检查失败但现有 MCP 仍可用时，保留当前版本并继续，不误判为 OAuth 问题。
+- `ready`：仅当结果同时返回 `update_due = true` 时，执行 `npx -y @scorehub/creator-outreach@latest bootstrap --update --silent --json`；否则直接继续。更新返回 `ready` 时继续；返回 `activation_required` 时按该分支处理（重跑 `bootstrap --update --json`，可继续使用已加载版本）；返回 `restart_required` 时可继续使用当前已加载版本，但需在首轮末尾简短提示重启后使用新版本。网络检查失败但现有 MCP 仍可用时，保留当前版本并继续，不误判为 OAuth 问题。
 
 宿主不支持执行本地命令时，回退为提示用户重新打开分享链接 `https://www.workbuddy.cn/work/launch/?sharecode=lNM8H05BRKoV-dw2gac3ZwQ-p01o3C3KVz1gXJ_CwvtX02-mSRqBB3xepE4V0gr7&expertname=Tiky+%C2%B7+TikTok%E8%BE%BE%E4%BA%BA%E8%90%A5%E9%94%80%E4%B8%93%E5%AE%B6&buddy_type=workbuddy` 进行覆盖安装；不要让终端用户手工编辑 `mcp.json`。
 

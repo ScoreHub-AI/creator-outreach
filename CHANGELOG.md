@@ -6,11 +6,31 @@
 
 - Fix WorkBuddy restart state recovery after MCP reload
 
-## Unreleased
+## 1.9.0
+
+### Added
+
+- Split delivery into two channels: the open-platform listing stays the end-user release (WorkBuddy downloads and materializes it; the installer only reads its version for diagnostics), while the local install becomes the developer's self-test path via the new `bootstrap --dev` flag. The dev copy registers as `tiktok-creator-outreach-dev@my-experts`, carries its own display name (`ScoreHub Tiky（本地自测）`), and renames every skill id with a `-dev` suffix (`tiktok-creator-search` → `tiktok-creator-search-dev`), so it can no longer be confused with — or silently shadowed by — the platform version.
+- `bootstrap --dev` now activates the self-test channel end to end instead of only dropping a directory: it upserts the `my-experts` marketplace manifest entry (the plugin manager treats that manifest as scan **input** in 5.5.x, so an unregistered directory is invisible and never self-heals), materializes the versioned cache that WorkBuddy actually loads from, upserts the `installed_plugins.json` user-scope record, and writes `enabledPlugins[<id>] = true`. All four writes roll back together if any step fails.
+- `bootstrap --check --json` additionally returns `platform_creator_outreach_version`, `platform_channel_enabled`, `local_channel_version`, `local_channel_enabled`, `local_channel_skill_ids` and `legacy_local_copy` so both channels — and any leftover same-named copy — can be inspected without guessing.
 
 ### Fixed
 
 - Allow the WorkBuddy bootstrap gate to verify the restarted MCP process with `status` and clear `restart_required` when the loaded managed configuration matches the installed plugin version.
+- Stop treating "written to the official expert directory" as "loaded by WorkBuddy". The bootstrap gate now reads the actually loaded version from `plugins/installed_plugins.json` (and verifies the cache directory exists) instead of the source directory it just wrote, so it can no longer report `ready` while users still run an older cached copy.
+- Add the `activation_required` bootstrap state for "the source position is new but the versioned plugin cache is still old". A restart never fixes this, so the gate no longer tells users to look for a plugin-management Update entry — which does not exist for the dev channel — and instead re-runs `bootstrap --update`, which advances the cache itself.
+- Always re-materialize the dev cache on `--dev` instead of skipping when the version is unchanged: `plugin.json`'s `version` often stays the same across a self-test edit loop, and a version-based "cache is already current" check would keep serving stale code — the exact failure this mechanism exists to prevent.
+- Both `install()` and `update()` now clean up the legacy same-named `my-experts` copy written by older installers (`cleanupLegacyLocalCopy`): the plugin directory, its versioned cache, the `tiktok-creator-outreach@my-experts` registry record, its `enabledPlugins` entry, and the marketplace manifest entry. That copy was never registered in the manifest, so it stayed invisible in the plugin UI, yet it still participated in extension loading — on a real machine it loaded the same skill names as the platform build in the same process, which is one of the causes of "updated the package but still running the old code". Matching is done by the `plugin.json` `name` inside the directory, and other custom experts are preserved.
+- Correct the documented meaning of `enabledPlugins`: it is **not** a load gate. On a real machine both `tiktok-creator-outreach@experts` and `tiktok-creator-outreach@my-experts` had `false` in `settings.json` and both still logged `Loaded N skill(s)` on the same day. Distinct plugin names, distinct skill ids, and cache materialization decide what actually loads; the flag only drives the enabled state shown in the plugin manager.
+- Stop a silent update triggered by the **published** package from overwriting the self-test copy with released code. `update()` refreshes the dev channel, and the agent session runs `npx @scorehub/creator-outreach@latest`, whose `__dirname` points at the npm cache rather than the developer's checkout — so the refresh used to copy the release over any unpublished work while still reporting a plausible version. `bootstrap --dev` now records its source root in the registry record (`sourceDir`), and every later refresh materializes from that directory; only an explicit `--dev` run from a local checkout overrides it, and it falls back to the running package when the recorded directory is gone. `bootstrap --check --json` reports it as `local_channel_source_dir`.
+
+### Changed
+
+- `bootstrap --check --json` additionally returns `source_creator_outreach_version` and `effective_creator_outreach_version` so the two locations can be compared directly.
+- A plain `bootstrap --install` / `--update` no longer registers or materializes any plugin: it only configures MCP (plus the legacy-copy cleanup above), so end users never get a second expert fighting the platform version for the same agent and skill names.
+- Skip the pointless restart prompt when the MCP configuration is already current and only the loaded plugin version is stale.
+- `bootstrap --mark-ready --json` now clears the restart flag even while an activation gap remains, and returns `activation_required` instead of throwing.
+- The `restart_required` reason now covers plugin changes as well as MCP configuration changes.
 
 ## 1.8.0
 
