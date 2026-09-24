@@ -1,6 +1,6 @@
 {
   "name": "tiktok-creator-outreach",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "ScoreHub AI's TikTok creator marketing expert for building clear creator profiles and validating focused collaboration shortlists across 13 markets in Southeast Asia, the United States, and Europe.",
   "author": {
     "name": "Ben",
@@ -13,7 +13,8 @@
     "./skills/tiktok-creator-search",
     "./skills/tiktok-creator-analysis",
     "./skills/tiktok-batch-outreach",
-    "./skills/tiktok-similar-creators"
+    "./skills/tiktok-similar-creators",
+    "./skills/tiktok-affiliate-analytics"
   ],
   "expertType": "agent",
   "agentName": "tiktok-creator-outreach",
@@ -26,8 +27,8 @@
     "zh": "TikTok 达人营销专家"
   },
   "displayDescription": {
-    "en": "Tiky is ScoreHub AI's TikTok creator marketing expert. She builds creator profiles and validates focused outreach shortlists.",
-    "zh": "Tiky 是 ScoreHub AI TikTok 达人营销专家，建立达人画像并小范围建联验证。"
+    "en": "Tiky is ScoreHub AI's TikTok creator marketing expert for creator profiles, shop analytics, and focused outreach.",
+    "zh": "Tiky 是 ScoreHub AI TikTok 达人营销专家，达人画像、小范围建联验证及经营分析"
   },
   "avatar": "avatars/scorehub-ai-white.png",
   "categoryId": "07-SalesCommerce",
@@ -60,8 +61,8 @@
       "zh": "帮我找一批适合我店铺品类的 TikTok 达人"
     },
     {
-      "en": "Evaluate the collaboration value of these creators",
-      "zh": "帮我评估这几个达人的合作价值"
+      "en": "Analyze my shop's affiliate performance and product results for the previous calendar month",
+      "zh": "分析我店铺上个月的联盟经营和商品表现"
     }
   ]
 }

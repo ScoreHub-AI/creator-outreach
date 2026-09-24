@@ -1,6 +1,6 @@
 # creator-outreach — 产品与协作文档
 
-> **实现状态**: 当前已实现 Agent 定义、WorkBuddy 插件清单、四个 Skill、Rank 分数契约与消息模板参考、`create_conversation` 建联链路、账号与店铺切换、搜索/评分的固定 Markdown 与 WorkBuddy HTML 输出能力，以及 WorkBuddy 开放平台上架素材包（`listing/` + `scripts/`）。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
+> **实现状态**: 当前已实现 Agent 定义、WorkBuddy 插件清单、五个 Skill、Rank 分数契约与消息模板参考、`create_conversation` 建联链路、账号与店铺切换、搜索/评分的固定 Markdown 与 WorkBuddy HTML 输出能力，以及 WorkBuddy 开放平台上架素材包（`listing/` + `scripts/`）。当前进度详见 [ROADMAP.md](./ROADMAP.md)。
 
 ## 文档权威来源
 
@@ -14,6 +14,7 @@
   - [`../skills/tiktok-creator-analysis/SKILL.md`](../skills/tiktok-creator-analysis/SKILL.md)
   - [`../skills/tiktok-batch-outreach/SKILL.md`](../skills/tiktok-batch-outreach/SKILL.md)
   - [`../skills/tiktok-similar-creators/SKILL.md`](../skills/tiktok-similar-creators/SKILL.md)
+  - [`../skills/tiktok-affiliate-analytics/SKILL.md`](../skills/tiktok-affiliate-analytics/SKILL.md)
   - 各自领域特有的触发条件、输入输出契约和关键陷阱的权威来源
 - **Reference 细节规则**：
   - 搜索筛选字段、自然语言映射、取值范围与互斥关系以 [`../skills/tiktok-creator-search/references/creator-search-filters.md`](../skills/tiktok-creator-search/references/creator-search-filters.md) 为准
@@ -49,7 +50,7 @@ Tiky 是 ScoreHub AI 面向 TikTok Shop 卖家的达人营销专家。其核心�
 本包主要包含以下内容：
 
 - **Agent 定义**：智能体身份、首轮欢迎语、工具使用边界和统一行为规则
-- **Skills**：搜索、评分、建联三个能力入口及各自专项契约
+- **Skills**：搜索、评分、建联、相似达人和数据分析五个能力入口及各自专项契约
 - **插件元数据**：WorkBuddy 插件清单、展示名、头像、快捷入口
 - **安装器**：将插件复制到 WorkBuddy，并写入 `@scorehub/mcp-server` 的 MCP 配置
 - **公开版引导**：在 WorkBuddy 每个新会话强制执行 bootstrap 状态门禁，首次确认后预拉取并自检 `mcp-server@latest`，后续静默更新 creator-outreach，并仅在明确证据下恢复 Node.js LTS

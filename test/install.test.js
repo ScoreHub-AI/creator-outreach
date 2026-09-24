@@ -243,6 +243,12 @@ test('bootstrap --dev activates the local self-test channel end to end', () => {
   assert.equal(cachedManifest.name, PLUGIN_NAME);
   assert.equal(cachedManifest.version, PACKAGE_VERSION);
   assert.equal(fs.existsSync(path.join(cacheDir, 'agents', 'tiktok-creator-outreach.md')), true);
+  assert.equal(cachedManifest.skills.length, 5);
+  const analyticsDir = path.join(cacheDir, 'skills', 'tiktok-affiliate-analytics');
+  assert.match(fs.readFileSync(path.join(analyticsDir, 'SKILL.md'), 'utf8'), /name: tiktok-affiliate-analytics-dev/);
+  for (const reference of fs.readdirSync(path.join(__dirname, '..', 'skills', 'tiktok-affiliate-analytics', 'references'))) {
+    assert.ok(fs.existsSync(path.join(analyticsDir, 'references', reference)), `Missing packaged analytics reference: ${reference}`);
+  }
 
   // 4. 登记表与启用开关就位，声明「自测通道已加载这一版」。
   assert.deepEqual(readEffectivePluginVersion(paths), {

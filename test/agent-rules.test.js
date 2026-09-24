@@ -541,12 +541,52 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
       'tiktok-creator-analysis',
       'tiktok-batch-outreach',
       'tiktok-similar-creators',
+      'tiktok-affiliate-analytics',
     ]) {
       assert.match(variant, new RegExp(skill));
     }
   } finally {
     fs.rmSync(outPath, { force: true });
   }
+});
+
+test('ships analytics as the fifth skill with self-contained references and a single rule owner', () => {
+  const skillDir = path.join(__dirname, '..', 'skills', 'tiktok-affiliate-analytics');
+  const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
+  assert.equal(pluginJson.skills.length, 5);
+  assert.equal(pluginJson.skills[4], './skills/tiktok-affiliate-analytics');
+  assert.match(agent, /  - tiktok-affiliate-analytics/);
+  assert.match(skill, /当前日期为 1–4 号.*上一个完整自然月/);
+  assert.match(skill, /前 4 天/);
+  assert.match(skill, /同月子区间/);
+  assert.match(skill, /AskUserQuestion/);
+  assert.match(skill, /只有一个可分析店铺时直接继续/);
+  assert.match(skill, /analyzable=true/);
+  assert.match(skill, /Top5/);
+  assert.match(skill, /当前 OAuth 选中店铺/);
+  assert.match(skill, /不调用 Rank 改排/);
+  const refs = fs.readdirSync(path.join(skillDir, 'references')).map((file) => path.join(skillDir, 'references', file));
+  for (const file of [path.join(skillDir, 'SKILL.md'), ...refs]) {
+    const content = fs.readFileSync(file, 'utf8');
+    assert.doesNotMatch(content, /项目文档《|15Tiky\(1\)|deepseek|harness/i);
+    for (const match of content.matchAll(/\]\((\.[^)]+)\)/g)) {
+      assert.ok(fs.existsSync(path.resolve(path.dirname(file), match[1])), `Missing reference: ${file} -> ${match[1]}`);
+    }
+  }
+  const rules = fs.readFileSync(path.join(skillDir, 'references', 'business-rules.md'), 'utf8');
+  assert.match(rules, /no_data.*没有可用记录/);
+  assert.match(rules, /不等同于 0/);
+  const joins = fs.readFileSync(path.join(skillDir, 'references', 'data-join-and-attribution.md'), 'utf8');
+  assert.match(joins, /target_collaboration_id.*creator_username.*至少一个/);
+  assert.match(joins, /DISTINCT order_id/);
+  assert.match(joins, /不自动排除取消或退款订单/);
+  assert.match(joins, /sale_price/);
+  assert.match(joins, /不含运费|排除运费/);
+  const routing = fs.readFileSync(path.join(skillDir, 'references', 'scenario-routing.md'), 'utf8');
+  assert.match(routing, /availability=.*仅表示请求/);
+  assert.doesNotMatch(routing, /当前日期.*4|DISTINCT order_id/);
+  const summary = getMarkdownSection(agent, '## 核心能力');
+  assert.doesNotMatch(summary, /success_day_count|sale_price|DISTINCT|前 4 天/);
 });
 
 test('documents the activation_required state as a fifth bootstrap branch', () => {

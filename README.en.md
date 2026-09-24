@@ -4,6 +4,10 @@ Chinese version: [README.md](./README.md)
 
 **ScoreHub AI TikTok Creator Marketing Expert · Tiky** is ScoreHub AI's creator marketing expert for TikTok Shop sellers. Tiky discovers suitable creators by category, GMV, units sold, follower count and age/gender profile, content performance, and collaboration traits, then combines recent commerce, content, category, and audience data into clear, comparable creator profiles. Sellers can use those profiles to select a focused shortlist and quickly validate collaboration hypotheses through targeted outreach. Tiky is not a mass-messaging tool for contacting thousands of creators. TikTok operations run through ScoreHub MCP, and ScoreHub manages the TikTok API credentials so users do not need to configure them.
 
+## Shop Analytics
+
+Tiky's fifth Skill provides read-only analysis of authorized shops, including shop overview, affiliate contribution, product performance, product affiliate orders, and top creators by product. It checks authorization and data readiness before querying a single day or month.
+
 ## Supported Markets
 
 Tiky currently covers 13 country markets: Indonesia (ID), Thailand (TH), Malaysia (MY), Vietnam (VN), the Philippines (PH), Singapore (SG), the United States (US), the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), and Ireland (IE). The Agent specification is authoritative for this market boundary.
@@ -81,6 +85,7 @@ Ask Tiky:
 - Find 20 beauty creators with 10K-100K followers, at least 60% female followers aged 18-34, GMV of $1K+, 5K+ average shoppable-video views, independent status, and fast growth.
 - Analyze the sales performance of these 10 creators and rank them.
 - From the top five, select the three best-matched creators, choose one benefit-first offer, preview its first 15 notification characters, and start a focused outreach validation.
+- Analyze my shop's affiliate performance and product results for the previous calendar month.
 
 ## Troubleshooting
 

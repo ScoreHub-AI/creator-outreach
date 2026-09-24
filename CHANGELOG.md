@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## 1.10.0
+
+### Minor Changes
+
+- add data analysis feature
+
 ## 1.8.1
 
 ### Patch Changes
