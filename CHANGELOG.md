@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## 1.10.1
+
+### Patch Changes
+
+- Add Tiky analytics tools for account and shop analysis, including shop-scoped authorization, sync readiness validation, and structured analytics responses.
+
 ## 1.10.0
 
 ### Minor Changes
