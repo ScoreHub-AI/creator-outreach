@@ -138,7 +138,7 @@ description: 在 TikTok Shop Creator Marketplace 中按关键词、类目、商�
 
 支持市场 allowlist 属于共享产品边界，以 Agent“限制与注意事项”中的“支持市场”为唯一权威来源，本 Skill 不重复维护国家表。
 
-用户在搜索前若明确指定目标市场（如“帮我找日本的达人”），先按 Agent 的支持市场判断；不在 allowlist 中时应**立即告知不支持该市场**，并建议用户改选受支持的市场，不要直接调用 `search_creators`。
+用户在搜索前若明确指定目标市场，先按 Agent 的支持市场判断；不在 allowlist 中时应**立即告知不支持该市场**，并建议用户改选受支持的市场，不要直接调用 `search_creators`。
 
 ## 错误处理
 

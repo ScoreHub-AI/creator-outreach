@@ -10,7 +10,7 @@ Tiky's fifth Skill provides read-only analysis of authorized shops, including sh
 
 ## Supported Markets
 
-Tiky currently covers 13 country markets: Indonesia (ID), Thailand (TH), Malaysia (MY), Vietnam (VN), the Philippines (PH), Singapore (SG), the United States (US), the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), and Ireland (IE). The Agent specification is authoritative for this market boundary.
+Tiky currently covers 16 country markets: Indonesia (ID), Thailand (TH), Malaysia (MY), Vietnam (VN), the Philippines (PH), Singapore (SG), the United States (US), the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), Ireland (IE), Japan (JP), Brazil (BR), and Mexico (MX). The Agent specification is authoritative for this market boundary.
 
 ## Supported Clients
 

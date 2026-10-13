@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## 1.11.0
+
+### Minor Changes
+
+- Add Japan (JP), Brazil (BR), and Mexico (MX), expanding Tiky's supported-market boundary to 16 countries. Update the Agent, product summaries, listing materials, and market regression coverage. Existing outreach language and message templates are unchanged.
+
 ## 1.10.1
 
 ### Patch Changes

@@ -29,6 +29,7 @@ const packageReadmePath = path.join(__dirname, '..', 'README.md');
 const packageReadme = fs.readFileSync(packageReadmePath, 'utf8');
 const packageReadmeEnPath = path.join(__dirname, '..', 'README.en.md');
 const packageReadmeEn = fs.readFileSync(packageReadmeEnPath, 'utf8');
+const listingReadme = fs.readFileSync(path.join(__dirname, '..', 'listing', 'README.md'), 'utf8');
 const onboardingPath = path.join(__dirname, '..', 'docs', 'WORKBUDDY_PUBLIC_ONBOARDING.md');
 const onboardingDoc = fs.readFileSync(onboardingPath, 'utf8');
 const repositoryRoot = path.join(__dirname, '..', '..', '..');
@@ -198,7 +199,7 @@ test('keeps the welcome example and capability promises aligned with actual beha
   assert.doesNotMatch(outreachSkill, /9:00-21:00/);
 });
 
-test('keeps the 13-country market boundary authoritative in the agent', () => {
+test('keeps the 16-country market boundary authoritative in the agent', () => {
   const supportedMarkets = [
     ['泰国', 'Thailand', 'TH'],
     ['马来西亚', 'Malaysia', 'MY'],
@@ -213,11 +214,19 @@ test('keeps the 13-country market boundary authoritative in the agent', () => {
     ['法国', 'France', 'FR'],
     ['西班牙', 'Spain', 'ES'],
     ['爱尔兰', 'Ireland', 'IE'],
+    ['日本', 'Japan', 'JP'],
+    ['巴西', 'Brazil', 'BR'],
+    ['墨西哥', 'Mexico', 'MX'],
   ];
 
-  assert.equal((agent.match(/当前覆盖 13 个国家市场/g) || []).length, 2);
+  assert.equal((agent.match(/当前覆盖 16 个国家市场/g) || []).length, 2);
+  const marketBoundary = agent.split('- **支持市场**：')[1].split('\n')[0];
+  const marketCodes = [...marketBoundary.matchAll(/（([A-Z]{2})）/g)].map((match) => match[1]);
+  assert.deepEqual(marketCodes, supportedMarkets.map(([, , code]) => code));
+  assert.equal(new Set(marketCodes).size, 16);
+  assert.doesNotMatch(agent, /其他市场（如[^）]*(?:日本|巴西|墨西哥)/);
   for (const [countryZh, countryEn, code] of supportedMarkets) {
-    for (const source of [agent, packageReadme]) {
+    for (const source of [agent, packageReadme, listingReadme]) {
       assert.match(source, new RegExp(`${countryZh}（${code}）`));
     }
     assert.match(brochure, new RegExp(countryZh));
@@ -226,16 +235,18 @@ test('keeps the 13-country market boundary authoritative in the agent', () => {
 
   assert.match(searchSkill, /支持市场 allowlist.*以 Agent.*唯一权威来源/);
   assert.doesNotMatch(searchSkill, /\| 国家 \| 代码 \|/);
-  assert.match(pluginJson.description, /13 markets.*Southeast Asia.*United States.*Europe/);
+  assert.doesNotMatch(searchSkill, /日本（JP）|巴西（BR）|墨西哥（MX）|覆盖 16 个国家/);
+  assert.match(pluginJson.description, /16 markets.*Southeast Asia.*United States.*Europe.*Japan.*Brazil.*Mexico/);
   // 官方字段表要求 tags 固定 3 个，市场覆盖改由 description 承载（见上一行断言）
   assert.equal(pluginJson.tags.length, 3);
   for (const tag of pluginJson.tags) {
     assert.match(tag.en, /\S/);
     assert.match(tag.zh, /\S/);
   }
-  assert.match(packageReadme, /当前覆盖 13 个国家市场/);
-  assert.match(packageReadmeEn, /currently covers 13 country markets/);
-  assert.match(brochure, /13 个国家市场协同/);
+  assert.match(packageReadme, /当前覆盖 16 个国家市场/);
+  assert.match(packageReadmeEn, /currently covers 16 country markets/);
+  assert.match(brochure, /16 个国家市场协同/);
+  assert.match(listingReadme, /覆盖 16 个国家市场/);
 });
 
 test('only asks for category confirmation when multiple matches remain ambiguous', () => {
@@ -536,6 +547,8 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
     assert.match(variant, /不是海量群发工具/);
     assert.match(variant, /`switch_shop`/);
     assert.match(variant, /ScoreHub 服务暂时未连接/);
+    assert.match(variant, /当前覆盖 16 个国家市场/);
+    assert.match(variant, /日本（JP）、巴西（BR）、墨西哥（MX）/);
     for (const skill of [
       'tiktok-creator-search',
       'tiktok-creator-analysis',
