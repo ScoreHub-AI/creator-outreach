@@ -206,8 +206,8 @@ fi
 cp "$PKG_DIR/listing/.mcp.json" "$TREE_DIR/.mcp.json"
 cp "$PKG_DIR/listing/README.md" "$TREE_DIR/README.md"
 
-# 上架版 Agent 正文由权威正文生成，不直接复制权威正文
-mkdir -p "$TREE_DIR/agents"
+# 保留 Agent 补充与共享 Reference，再用生成器替换主正文。
+cp -R "$PKG_DIR/agents" "$TREE_DIR/"
 python3 "$SCRIPT_DIR/build-platform-agent.py" "$AGENT_SRC" "$TREE_DIR/$AGENT"
 
 find "$TREE_DIR" -name '.DS_Store' -delete
@@ -217,6 +217,36 @@ CLEAN_REFS=("agents" "skills" "avatars" ".codebuddy-plugin" ".mcp.json" "README.
 for ref in "${CLEAN_REFS[@]}"; do
   [[ -e "$TREE_DIR/$ref" ]] || fail "打包结果缺少 $ref"
 done
+
+python3 - "$TREE_DIR" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+root = Path(sys.argv[1]).resolve()
+required = [
+    'agents/tiktok-creator-outreach.lookup-additions.md',
+    'agents/references/quick-lookup/common-contract.md',
+    'agents/references/quick-lookup/identifiers-and-relations.md',
+    'agents/references/quick-lookup/reply-support-tool-contracts.md',
+]
+errors = [f'缺少随包契约: {name}' for name in required if not (root / name).is_file()]
+sources = list((root / 'agents').rglob('*.md'))
+for skill in ('scorehub-sample-lookup', 'scorehub-creator-message-lookup', 'scorehub-email-lookup'):
+    sources.extend((root / 'skills' / skill).rglob('*.md'))
+for source in sources:
+    for link in re.findall(r'\]\(([^)]+)\)', source.read_text(encoding='utf-8')):
+        path = link.split('#', 1)[0]
+        if not path or re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:', path):
+            continue
+        target = (source.parent / path).resolve()
+        if not target.is_relative_to(root) or not target.exists():
+            errors.append(f'包内引用缺失: {source.relative_to(root)} -> {link}')
+if errors:
+    print('\n'.join(errors), file=sys.stderr)
+    sys.exit(1)
+print('Agent/Skill 随包契约与相对引用校验通过')
+PY
 
 LEAKED=""
 if grep -rInE 'sk-[A-Za-z0-9]{16,}|Bearer [A-Za-z0-9._-]{24,}|AKID[A-Za-z0-9]{16,}' "$TREE_DIR" >/dev/null 2>&1; then

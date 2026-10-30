@@ -23,6 +23,24 @@ const outreachSkillPath = path.join(__dirname, '..', 'skills', 'tiktok-batch-out
 const outreachSkill = fs.readFileSync(outreachSkillPath, 'utf8');
 const messageTemplatesPath = path.join(__dirname, '..', 'skills', 'tiktok-batch-outreach', 'references', 'message-templates.md');
 const messageTemplates = fs.readFileSync(messageTemplatesPath, 'utf8');
+const sampleSkillPath = path.join(__dirname, '..', 'skills', 'scorehub-sample-lookup', 'SKILL.md');
+const sampleSkill = fs.readFileSync(sampleSkillPath, 'utf8');
+const sampleFieldsPath = path.join(__dirname, '..', 'skills', 'scorehub-sample-lookup', 'references', 'tools-and-fields.md');
+const sampleFields = fs.readFileSync(sampleFieldsPath, 'utf8');
+const messageSkillPath = path.join(__dirname, '..', 'skills', 'scorehub-creator-message-lookup', 'SKILL.md');
+const messageSkill = fs.readFileSync(messageSkillPath, 'utf8');
+const messageFieldsPath = path.join(__dirname, '..', 'skills', 'scorehub-creator-message-lookup', 'references', 'tools-and-fields.md');
+const messageFields = fs.readFileSync(messageFieldsPath, 'utf8');
+const emailSkillPath = path.join(__dirname, '..', 'skills', 'scorehub-email-lookup', 'SKILL.md');
+const emailSkill = fs.readFileSync(emailSkillPath, 'utf8');
+const emailFieldsPath = path.join(__dirname, '..', 'skills', 'scorehub-email-lookup', 'references', 'tools-and-fields.md');
+const emailFields = fs.readFileSync(emailFieldsPath, 'utf8');
+const lookupAdditionsPath = path.join(__dirname, '..', 'agents', 'tiktok-creator-outreach.lookup-additions.md');
+const lookupAdditions = fs.readFileSync(lookupAdditionsPath, 'utf8');
+const quickLookupReferenceDir = path.join(__dirname, '..', 'agents', 'references', 'quick-lookup');
+const commonContract = fs.readFileSync(path.join(quickLookupReferenceDir, 'common-contract.md'), 'utf8');
+const identifiersReference = fs.readFileSync(path.join(quickLookupReferenceDir, 'identifiers-and-relations.md'), 'utf8');
+const supportContract = fs.readFileSync(path.join(quickLookupReferenceDir, 'reply-support-tool-contracts.md'), 'utf8');
 const docsReadmePath = path.join(__dirname, '..', 'docs', 'README.md');
 const docsReadme = fs.readFileSync(docsReadmePath, 'utf8');
 const packageReadmePath = path.join(__dirname, '..', 'README.md');
@@ -199,7 +217,7 @@ test('keeps the welcome example and capability promises aligned with actual beha
   assert.doesNotMatch(outreachSkill, /9:00-21:00/);
 });
 
-test('keeps the 16-country market boundary authoritative in the agent', () => {
+test('keeps the 19-country market boundary authoritative in the agent', () => {
   const supportedMarkets = [
     ['泰国', 'Thailand', 'TH'],
     ['马来西亚', 'Malaysia', 'MY'],
@@ -214,17 +232,26 @@ test('keeps the 16-country market boundary authoritative in the agent', () => {
     ['法国', 'France', 'FR'],
     ['西班牙', 'Spain', 'ES'],
     ['爱尔兰', 'Ireland', 'IE'],
+    ['波兰', 'Poland', 'PL'],
+    ['捷克', 'Czechia', 'CZ'],
+    ['葡萄牙', 'Portugal', 'PT'],
     ['日本', 'Japan', 'JP'],
     ['巴西', 'Brazil', 'BR'],
     ['墨西哥', 'Mexico', 'MX'],
   ];
 
-  assert.equal((agent.match(/当前覆盖 16 个国家市场/g) || []).length, 2);
+  assert.equal((agent.match(/当前覆盖 19 个国家市场/g) || []).length, 2);
   const marketBoundary = agent.split('- **支持市场**：')[1].split('\n')[0];
   const marketCodes = [...marketBoundary.matchAll(/（([A-Z]{2})）/g)].map((match) => match[1]);
   assert.deepEqual(marketCodes, supportedMarkets.map(([, , code]) => code));
-  assert.equal(new Set(marketCodes).size, 16);
-  assert.doesNotMatch(agent, /其他市场（如[^）]*(?:日本|巴西|墨西哥)/);
+  assert.equal(new Set(marketCodes).size, 19);
+  const welcome = getMarkdownSection(agent, '> ## 支持的市场');
+  const welcomeCodes = [...welcome.matchAll(/（([A-Z]{2})）/g)].map((match) => match[1]);
+  assert.equal(welcomeCodes.length, 19);
+  assert.deepEqual([...welcomeCodes].sort(), [...marketCodes].sort());
+  assert.match(marketBoundary, /用户明确提到其他市场时，主动说明不支持/);
+  assert.doesNotMatch(marketBoundary, /（NL）|（AU）/);
+  assert.doesNotMatch(agent, /其他市场（如[^）]*(?:日本|巴西|墨西哥|波兰|捷克|葡萄牙)/);
   for (const [countryZh, countryEn, code] of supportedMarkets) {
     for (const source of [agent, packageReadme, listingReadme]) {
       assert.match(source, new RegExp(`${countryZh}（${code}）`));
@@ -235,18 +262,21 @@ test('keeps the 16-country market boundary authoritative in the agent', () => {
 
   assert.match(searchSkill, /支持市场 allowlist.*以 Agent.*唯一权威来源/);
   assert.doesNotMatch(searchSkill, /\| 国家 \| 代码 \|/);
-  assert.doesNotMatch(searchSkill, /日本（JP）|巴西（BR）|墨西哥（MX）|覆盖 16 个国家/);
-  assert.match(pluginJson.description, /16 markets.*Southeast Asia.*United States.*Europe.*Japan.*Brazil.*Mexico/);
+  assert.doesNotMatch(searchSkill, /日本（JP）|巴西（BR）|墨西哥（MX）|波兰（PL）|捷克（CZ）|葡萄牙（PT）|覆盖 \d+ 个国家/);
+  assert.match(pluginJson.description, /19 markets.*Southeast Asia.*United States.*Europe.*Japan.*Brazil.*Mexico/);
   // 官方字段表要求 tags 固定 3 个，市场覆盖改由 description 承载（见上一行断言）
   assert.equal(pluginJson.tags.length, 3);
   for (const tag of pluginJson.tags) {
     assert.match(tag.en, /\S/);
     assert.match(tag.zh, /\S/);
   }
-  assert.match(packageReadme, /当前覆盖 16 个国家市场/);
-  assert.match(packageReadmeEn, /currently covers 16 country markets/);
-  assert.match(brochure, /16 个国家市场协同/);
-  assert.match(listingReadme, /覆盖 16 个国家市场/);
+  assert.match(packageReadme, /当前覆盖 19 个国家市场/);
+  assert.match(packageReadmeEn, /currently covers 19 country markets/);
+  assert.match(brochure, /19 个国家市场协同/);
+  assert.match(listingReadme, /覆盖 19 个国家市场/);
+  for (const source of [agent, packageReadme, packageReadmeEn, brochure, listingReadme, pluginJson.description]) {
+    assert.doesNotMatch(source, /覆盖 16 个国家|covers 16 country markets|across 16 markets/);
+  }
 });
 
 test('only asks for category confirmation when multiple matches remain ambiguous', () => {
@@ -483,11 +513,23 @@ test('keeps the project-wide Agent Skill Reference ownership mechanism aligned',
   assert.match(agentsSection, /对非 owner 增加必要的反向断言/);
 });
 
-test('uses the WorkBuddy share link and self-bootstrap command as the public path', () => {
+test('documents the official marketplace link and the npm channel across delivery docs', () => {
   for (const source of [agent, packageReadme, packageReadmeEn, onboardingDoc]) {
     assert.match(source, new RegExp(WORKBUDDY_SHARE_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     assert.match(source, new RegExp(CREATOR_OUTREACH_SELF_BOOTSTRAP_COMMAND.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   }
+
+  // 渠道定位：官方市场是终端用户主渠道，npm 收敛为备用 / 预览 / 自测
+  assert.match(packageReadme, /官方市场（终端用户推荐）/);
+  assert.match(packageReadme, /npm 渠道（备用 \/ 预览 \/ 自测）/);
+  assert.match(packageReadmeEn, /Official marketplace \(recommended for end users\)/);
+  assert.match(packageReadmeEn, /npm channel \(backup \/ preview \/ self-test\)/);
+  // 「从 npm 安装指定版本到 WorkBuddy」的预览路径必须在两份包级 README 中可查
+  for (const source of [packageReadme, packageReadmeEn]) {
+    assert.match(source, /npx -y @scorehub\/creator-outreach@<[^>]+> bootstrap --dev --install/);
+  }
+  // bootstrap 状态机只属于 npm 渠道副本，市场版无门禁的口径必须同时出现在引导文档中
+  assert.match(onboardingDoc, /以下状态机只出现在 \*\*npm 渠道副本\*\*的会话中/);
 
   assert.doesNotMatch(packageReadme, /插件市场搜索 `@scorehub\/creator-outreach`/);
   assert.doesNotMatch(packageReadmeEn, /plugin marketplace/);
@@ -547,7 +589,12 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
     assert.match(variant, /不是海量群发工具/);
     assert.match(variant, /`switch_shop`/);
     assert.match(variant, /ScoreHub 服务暂时未连接/);
-    assert.match(variant, /当前覆盖 16 个国家市场/);
+    assert.match(variant, /当前覆盖 19 个国家市场/);
+    assert.match(variant, /波兰（PL）、捷克（CZ）、葡萄牙（PT）/);
+    assert.equal(
+      getMarkdownSection(variant, '## 限制与注意事项'),
+      getMarkdownSection(agent, '## 限制与注意事项'),
+    );
     assert.match(variant, /日本（JP）、巴西（BR）、墨西哥（MX）/);
     for (const skill of [
       'tiktok-creator-search',
@@ -555,6 +602,9 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
       'tiktok-batch-outreach',
       'tiktok-similar-creators',
       'tiktok-affiliate-analytics',
+      'scorehub-sample-lookup',
+      'scorehub-creator-message-lookup',
+      'scorehub-email-lookup',
     ]) {
       assert.match(variant, new RegExp(skill));
     }
@@ -566,7 +616,7 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
 test('ships analytics as the fifth skill with self-contained references and a single rule owner', () => {
   const skillDir = path.join(__dirname, '..', 'skills', 'tiktok-affiliate-analytics');
   const skill = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8');
-  assert.equal(pluginJson.skills.length, 5);
+  assert.equal(pluginJson.skills.length, 8);
   assert.equal(pluginJson.skills[4], './skills/tiktok-affiliate-analytics');
   assert.match(agent, /  - tiktok-affiliate-analytics/);
   assert.match(skill, /当前日期为 1–4 号.*上一个完整自然月/);
@@ -661,4 +711,206 @@ test('keeps the platform listing body free of every share-link bootstrap branch'
   for (const token of ['bootstrap', 'sharecode', 'activation_required', 'restart_required']) {
     assert.doesNotMatch(platformAgent, new RegExp(token));
   }
+});
+
+test('registers the three quick-lookup skills in the plugin, agent and disk layout', () => {
+  const quickLookupSkills = [
+    'scorehub-sample-lookup',
+    'scorehub-creator-message-lookup',
+    'scorehub-email-lookup',
+  ];
+  const frontmatter = agent.split('---')[1] || '';
+
+  assert.equal(pluginJson.skills.length, 8);
+  for (const skillId of quickLookupSkills) {
+    assert.ok(
+      pluginJson.skills.includes(`./skills/${skillId}`),
+      `plugin.json missing ${skillId}`,
+    );
+    assert.match(frontmatter, new RegExp(`^  - ${skillId}$`, 'm'));
+    assert.match(agent, new RegExp(skillId));
+    const skillFile = path.join(__dirname, '..', 'skills', skillId, 'SKILL.md');
+    assert.ok(fs.existsSync(skillFile), `missing ${skillFile}`);
+    assert.match(fs.readFileSync(skillFile, 'utf8'), new RegExp(`^name: ${skillId}$`, 'm'));
+    assert.ok(fs.existsSync(path.join(path.dirname(skillFile), 'references', 'tools-and-fields.md')));
+  }
+});
+
+test('routes sample, reply/chat and email requests through their domain skills', () => {
+  assert.match(agent, /六大核心能力/);
+  assert.match(agent, /6\. 随手查/);
+  assert.match(agent, /scorehub-sample-lookup/);
+  assert.match(agent, /scorehub-creator-message-lookup/);
+  assert.match(agent, /scorehub-email-lookup/);
+  assert.match(agent, /T12\/T14 只开放 `direct_message`/);
+  assert.match(agent, /不审批/);
+  assert.match(agent, /不寄样/);
+  assert.match(agent, /不建合作/);
+  assert.match(agent, /T04 刷新、T06\/T09 标读、T07 补存、T39 维护未知/);
+  assert.match(agent, /Agent 共享规则/);
+  for (const tool of [
+    'list_sample_applications',
+    'get_sample_application_detail',
+    'refresh_sample_applications',
+    'list_creator_reply_notifications',
+    'get_creator_reply_notification',
+    'get_creator_chat_messages',
+    'get_outreach_task_config',
+    'get_creator_task_send_records',
+    'list_email_records',
+    'get_received_email',
+    'query_email_send_statistics',
+    'query_crm_members',
+  ]) {
+    assert.match(agent, new RegExp(`\\b${tool}\\b`));
+  }
+});
+
+test('keeps quick-lookup triggers, tool names and read boundaries in the skills', () => {
+  assert.match(sampleSkill, /get_sample_application_detail/);
+  assert.match(sampleSkill, /不审批/);
+  assert.match(sampleSkill, /不寄样/);
+  assert.match(sampleSkill, /商品与规格/);
+  assert.match(sampleFields, /list_sample_applications/);
+  assert.match(sampleFields, /get_sample_application_detail/);
+  assert.match(sampleFields, /get_sample_sync_status/);
+  assert.match(sampleFields, /refresh_sample_applications/);
+  assert.match(sampleFields, /approveExpirationTime/);
+  assert.match(sampleFields, /shipmentExpirationTime/);
+  assert.match(sampleFields, /\/samples\/sample-applications\/\{applicationId\}/);
+  assert.match(sampleFields, /crm\.historical_sample/);
+  assert.match(sampleFields, /crm\.integration/);
+
+  assert.match(messageSkill, /list_creator_reply_notifications|get_creator_reply_notification/);
+  assert.match(messageSkill, /T12\/T14/);
+  assert.match(messageSkill, /不发送/);
+  assert.match(messageSkill, /不调用read-all/);
+  assert.match(messageFields, /list_creator_reply_notifications/);
+  assert.match(messageFields, /get_creator_reply_notification/);
+  assert.match(messageFields, /get_creator_chat_messages/);
+  assert.match(messageFields, /notification_mark_read/);
+  assert.match(messageFields, /chat_message_sync/);
+
+  assert.match(emailSkill, /list_email_records|get_received_email/);
+  assert.match(emailSkill, /T39/);
+  assert.match(emailSkill, /不发送/);
+  assert.match(emailFields, /list_email_records/);
+  assert.match(emailFields, /get_received_email/);
+  assert.match(emailFields, /query_email_send_statistics/);
+  assert.match(emailFields, /email_mark_read/);
+  assert.match(emailSkill, /all_members/);
+  assert.match(emailSkill, /CRM成员编号必须经可信关系映射成邮件目标/);
+
+  for (const skill of [sampleSkill, messageSkill, emailSkill]) {
+    assert.match(skill, /Agent共享规则/);
+    assert.doesNotMatch(skill, /10\s*次[\s\S]{0,40}30\s*秒/);
+  }
+});
+
+test('keeps shared query contracts and T12/T14/T39 support in references', () => {
+  assert.match(commonContract, /read_status/);
+  assert.match(commonContract, /partial/);
+  assert.match(commonContract, /effects/);
+  assert.match(commonContract, /continuation_token/);
+  assert.match(commonContract, /subscription_status_maintenance/);
+  assert.match(identifiersReference, /member_id/);
+  assert.match(identifiersReference, /task_creator_row_id/);
+  assert.match(identifiersReference, /authUserId/);
+  assert.match(supportContract, /T12/);
+  assert.match(supportContract, /T14/);
+  assert.match(supportContract, /T39/);
+  assert.match(supportContract, /direct_message/);
+  assert.match(supportContract, /all_members/);
+  assert.match(supportContract, /result=\{task,creator,messages,count\}/);
+  assert.match(lookupAdditions, /10次/);
+  assert.match(lookupAdditions, /30秒/);
+  assert.match(lookupAdditions, /T04/);
+  assert.match(lookupAdditions, /T39/);
+  for (const source of [sampleSkill, sampleFields, messageSkill, messageFields, emailSkill, emailFields, lookupAdditions]) {
+    assert.doesNotMatch(source, /待开发对齐|正式注册仍待开发确认|目前未执行|由开发评审|拟新增/);
+  }
+});
+
+test('keeps every shipped quick-lookup relative reference resolvable', () => {
+  const files = [
+    lookupAdditionsPath,
+    path.join(quickLookupReferenceDir, 'common-contract.md'),
+    path.join(quickLookupReferenceDir, 'identifiers-and-relations.md'),
+    path.join(quickLookupReferenceDir, 'reply-support-tool-contracts.md'),
+    sampleSkillPath,
+    sampleFieldsPath,
+    messageSkillPath,
+    messageFieldsPath,
+    emailSkillPath,
+    emailFieldsPath,
+  ];
+  for (const file of files) {
+    const source = fs.readFileSync(file, 'utf8');
+    assert.doesNotMatch(source, /\]\(\.\.\/\.\.\/\.\.\/\.\.\/0/, `external requirement link in ${file}`);
+    for (const match of source.matchAll(/\]\((\.[^)]+)\)/g)) {
+      const target = path.resolve(path.dirname(file), match[1].split('#')[0]);
+      assert.ok(fs.existsSync(target), `Missing relative reference: ${file} -> ${match[1]}`);
+    }
+  }
+});
+
+test('routes historical task questions to creator records in the message skill', () => {
+  const workflow = getMarkdownSection(messageSkill, '## 已有任务关系与停止');
+  assert.match(workflow, /“当时发了什么”优先查询T14指定达人的现存发送记录/);
+  assert.match(workflow, /问当前保存文案、查询\/过滤设置时才按需T12/);
+  assert.match(workflow, /不强制先T12再T14/);
+  assert.match(workflow, /已有关系无须重新打开通知或标读/);
+  assert.match(workflow, /不为任务追溯默认读取整段聊天/);
+  assert.match(workflow, /配置或回填称为历史实发原文/);
+  assert.match(workflow, /含占位符的文本照源引用/);
+  assert.match(workflow, /关系已确认而消息读取失败时保留关系/);
+  assert.match(workflow, /不凭时间相邻断言/);
+  assert.match(workflow, /跨组支撑工具/);
+  // The workflow owner must not copy the field or identity implementation.
+  assert.doesNotMatch(workflow, /isInvitation|is_invitation|task_config_backfill|\/auth\/me|authUserId/);
+});
+
+test('keeps the task branch and source-content contract in the support reference', () => {
+  assert.match(supportContract, /direct_message表示本期ExtendSendTask查询分支/);
+  assert.match(supportContract, /不开放invitation对应的独立邀约任务查询/);
+  assert.match(supportContract, /ExtendSendTask\.isInvitation仅为源标记/);
+  assert.match(supportContract, /缺失或不可识别为null/);
+  assert.match(supportContract, /不能凭true\/缺失、任务名称或邀约卡片/);
+  assert.match(supportContract, /message_record只说明内容来自该达人现存任务消息记录/);
+  assert.match(supportContract, /是否发送成功按实际status\/result表达/);
+  assert.match(supportContract, /task_config_backfill只说明按当前配置回填/);
+  assert.match(supportContract, /长文续查只展示首次已取配置，不重读任务详情/);
+  assert.match(supportContract, /业务成员或店铺变化后/);
+  for (const summary of [agent, lookupAdditions, identifiersReference, messageFields]) {
+    assert.doesNotMatch(summary, /isInvitation|is_invitation|task_config_backfill/);
+  }
+  for (const summary of [agent, lookupAdditions]) {
+    assert.doesNotMatch(summary, /“当时发了什么”优先查询T14|不强制先T12再T14/);
+  }
+});
+
+test('requires actual chat identifiers and task links in the chat field reference', () => {
+  assert.match(messageFields, /店铺出站消息的taskId表示产生该消息的发送任务/);
+  assert.match(messageFields, /达人入站消息的replyToTaskId是系统关联到的最近出站任务/);
+  assert.match(messageFields, /不代表达人主观回复原因/);
+  assert.match(messageFields, /核对通知与聊天的messageId/);
+  assert.match(messageFields, /不能凭时间相邻、同一达人或卡片内容/);
+  assert.doesNotMatch(messageSkill, /店铺出站消息的taskId表示|replyToTaskId是系统关联到/);
+});
+
+test('documents the quick-lookup skill set in the package docs', () => {
+  for (const skillId of [
+    'scorehub-sample-lookup',
+    'scorehub-creator-message-lookup',
+    'scorehub-email-lookup',
+  ]) {
+    assert.match(docsReadme, new RegExp(skillId));
+  }
+  assert.match(docsReadme, /八个 Skill|8 个 Skill/);
+  assert.match(packageReadme, /样品申请/);
+  assert.match(packageReadme, /达人回复/);
+  assert.match(packageReadme, /邮件/);
+  assert.match(packageReadmeEn, /sample application/i);
+  assert.match(packageReadmeEn, /creator replies/i);
+  assert.match(packageReadmeEn, /email records/i);
 });

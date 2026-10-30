@@ -212,6 +212,10 @@ test('bootstrap --dev activates the local self-test channel end to end', () => {
   makeWorkBuddy(homeDir);
   const paths = getPaths(homeDir);
 
+  const sourceManifestPath = path.join(__dirname, '..', '.codebuddy-plugin', 'plugin.json');
+  const sourceAgentPath = path.join(__dirname, '..', 'agents', 'tiktok-creator-outreach.md');
+  const originalManifest = fs.readFileSync(sourceManifestPath, 'utf8');
+  const originalAgent = fs.readFileSync(sourceAgentPath, 'utf8');
   const result = install({ homeDir, selfCheck: successfulSelfCheck, dev: true });
   const manifest = readMarketplaceManifest(homeDir);
   const devManifest = readDevManifest(paths);
@@ -222,6 +226,7 @@ test('bootstrap --dev activates the local self-test channel end to end', () => {
   assert.equal(devManifest.plugin, PLUGIN_NAME);
   assert.equal(devManifest.displayName.zh, DEV_DISPLAY_NAME.zh);
   assert.match(devManifest.description, /本地自测副本$/);
+  assert.match(devManifest.description, /across 19 markets/);
   assert.notEqual(PLUGIN_NAME, 'tiktok-creator-outreach');
   // agentName 与 agents/ 文件名保持原样，否则运行时会找不到 agent markdown。
   assert.equal(devManifest.agentName, 'tiktok-creator-outreach');
@@ -242,12 +247,37 @@ test('bootstrap --dev activates the local self-test channel end to end', () => {
   ));
   assert.equal(cachedManifest.name, PLUGIN_NAME);
   assert.equal(cachedManifest.version, PACKAGE_VERSION);
-  assert.equal(fs.existsSync(path.join(cacheDir, 'agents', 'tiktok-creator-outreach.md')), true);
-  assert.equal(cachedManifest.skills.length, 5);
+  const expectedProfession = {
+    en: 'TikTok Creator Marketing Expert (local dev)',
+    zh: 'TikTok 达人营销专家（本地自测）',
+  };
+  assert.deepEqual(devManifest.profession, expectedProfession);
+  assert.deepEqual(cachedManifest.profession, expectedProfession);
+  for (const root of [paths.workBuddyPluginDir, cacheDir]) {
+    const devAgent = fs.readFileSync(path.join(root, 'agents', 'tiktok-creator-outreach.md'), 'utf8');
+    assert.match(devAgent, /profession:\n  en: "TikTok Creator Marketing Expert \(local dev\)"\n  zh: "TikTok 达人营销专家（本地自测）"/);
+    assert.match(devAgent, /^name: tiktok-creator-outreach$/m);
+    assert.match(devAgent, /我是 Tiky，ScoreHub AI 的 TikTok 达人营销专家。/);
+    assert.match(devAgent, /当前覆盖 19 个国家市场/);
+    assert.match(devAgent, /波兰（PL）、捷克（CZ）、葡萄牙（PT）/);
+  }
+  assert.equal(fs.readFileSync(sourceManifestPath, 'utf8'), originalManifest);
+  assert.equal(fs.readFileSync(sourceAgentPath, 'utf8'), originalAgent);
+  assert.equal(JSON.parse(originalManifest).profession.zh, 'TikTok 达人营销专家');
+  assert.equal(cachedManifest.skills.length, 8);
   const analyticsDir = path.join(cacheDir, 'skills', 'tiktok-affiliate-analytics');
   assert.match(fs.readFileSync(path.join(analyticsDir, 'SKILL.md'), 'utf8'), /name: tiktok-affiliate-analytics-dev/);
   for (const reference of fs.readdirSync(path.join(__dirname, '..', 'skills', 'tiktok-affiliate-analytics', 'references'))) {
     assert.ok(fs.existsSync(path.join(analyticsDir, 'references', reference)), `Missing packaged analytics reference: ${reference}`);
+  }
+  for (const skillId of ['scorehub-sample-lookup', 'scorehub-creator-message-lookup', 'scorehub-email-lookup']) {
+    const skillDir = path.join(cacheDir, 'skills', skillId);
+    assert.match(fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf8'), new RegExp(`name: ${skillId}-dev`));
+    assert.ok(fs.existsSync(path.join(skillDir, 'references', 'tools-and-fields.md')), `Missing packaged reference for ${skillId}`);
+  }
+  assert.ok(fs.existsSync(path.join(cacheDir, 'agents', 'tiktok-creator-outreach.lookup-additions.md')));
+  for (const reference of ['common-contract.md', 'identifiers-and-relations.md', 'reply-support-tool-contracts.md']) {
+    assert.ok(fs.existsSync(path.join(cacheDir, 'agents', 'references', 'quick-lookup', reference)), `Missing shared reference: ${reference}`);
   }
 
   // 4. 登记表与启用开关就位，声明「自测通道已加载这一版」。

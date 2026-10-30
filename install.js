@@ -10,7 +10,8 @@ const pkg = require('./package.json');
 const MIN_NODE_MAJOR = 18;
 const STATE_SCHEMA_VERSION = 1;
 const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000;
-const WORKBUDDY_SHARE_URL = 'https://www.workbuddy.cn/work/launch/?sharecode=lNM8H05BRKoV-dw2gac3ZwQ-p01o3C3KVz1gXJ_CwvtX02-mSRqBB3xepE4V0gr7&expertname=Tiky+%C2%B7+TikTok%E8%BE%BE%E4%BA%BA%E8%90%A5%E9%94%80%E4%B8%93%E5%AE%B6&buddy_type=workbuddy';
+// 官方市场（开放平台上架）的分享链接：终端用户经此安装正式版；npm 渠道宿主无法执行本地命令时也回退到它。
+const WORKBUDDY_SHARE_URL = 'https://www.workbuddy.cn/work/launch/?expertname=ScoreHub%20Tiky&prompt=%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&deeplink=workbuddy%3A%2F%2Ftask%3Faction%3Dstart%26expertId%3Dex_N3BAMfJWLgpz%26prompt%3D%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&buddy_type=workbuddy';
 const CREATOR_OUTREACH_SELF_BOOTSTRAP_COMMAND = 'npx -y @scorehub/creator-outreach@latest';
 const MCP_SERVER_SELF_CHECK_COMMAND = 'npx -y @scorehub/mcp-server@latest --self-check --json';
 
@@ -413,7 +414,7 @@ function applyDevSkillIds(stageDir) {
 /**
  * 把拷贝出来的插件包改写成本地自测身份。
  *
- * 改 name / plugin / displayName / description 四个身份字段，并给技能 id 加 `-dev` 后缀
+ * 改 name / plugin / displayName / description 与两处 profession，并给技能 id 加 `-dev` 后缀
  * （见 `applyDevSkillIds`）。**不动 agentName 和 agents/ 下的文件名**：专家运行时会按
  * agentName 在自己的 plugin 目录里定位 agent markdown，改名会连带要求重命名文件与
  * frontmatter，而 agentName 重名不会造成遮蔽（两侧各自的 agent 目录是独立的）。
@@ -428,6 +429,18 @@ function applyDevIdentity(stageDir) {
   manifest.name = PLUGIN_NAME;
   manifest.plugin = PLUGIN_NAME;
   manifest.displayName = DEV_DISPLAY_NAME;
+  manifest.profession = {
+    en: 'TikTok Creator Marketing Expert (local dev)',
+    zh: 'TikTok 达人营销专家（本地自测）',
+  };
+  // 仅改暂存副本的 frontmatter；保留 Agent 身份、正文与正式版源文件。
+  for (const file of listTextFiles(path.join(stageDir, 'agents'), /\.md$/i)) {
+    const before = fs.readFileSync(file, 'utf8');
+    const after = before.replace(/^---\r?\n[\s\S]*?\r?\n---/, (frontmatter) =>
+      frontmatter.replace(/^profession:[ \t]*\r?\n(?:[ \t]+[^\r\n]*\r?\n)*/m,
+        `profession:\n  en: ${JSON.stringify(manifest.profession.en)}\n  zh: ${JSON.stringify(manifest.profession.zh)}\n`));
+    if (after !== before) fs.writeFileSync(file, after);
+  }
   if (typeof manifest.description === 'string' && !manifest.description.includes(DEV_DESCRIPTION_SUFFIX)) {
     manifest.description = `${manifest.description}${DEV_DESCRIPTION_SUFFIX}`;
   }

@@ -2,8 +2,8 @@
 """从权威 Agent 正文生成 WorkBuddy 开放平台「上架版」正文。
 
 背景：`agents/tiktok-creator-outreach.md` 是 Agent 行为规范的唯一权威来源，其首轮
-bootstrap 门禁服务于**分享链接安装路径**（WorkBuddy 不在安装阶段配置 MCP，需由
-`npx @scorehub/creator-outreach bootstrap` 自行合并 `~/.workbuddy/mcp.json`）。
+bootstrap 门禁服务于**npm 渠道安装路径**（备用 / 预览 / 自测：WorkBuddy 不在安装阶段
+配置 MCP，需由 `npx @scorehub/creator-outreach bootstrap` 自行合并 `~/.workbuddy/mcp.json`）。
 开放平台上架走依赖引导卡片，平台负责 MCP 连接，因此上架版必须剥离该门禁。
 
 做法：不改权威正文、不维护第二份正文，只做一组**带锚点校验的确定性替换**。任一
@@ -30,7 +30,7 @@ REPLACEMENTS = [
 - `repair_required`：说明结果中的可恢复原因。若明确是 Node.js / npm / npx 问题，进入“本地运行环境恢复”；其他情况经用户确认后重试 `bootstrap --install --json`。修复前不进入业务流程。
 - `ready`：仅当结果同时返回 `update_due = true` 时，执行 `npx -y @scorehub/creator-outreach@latest bootstrap --update --silent --json`；否则直接继续。更新返回 `ready` 时继续；返回 `activation_required` 时按该分支处理（重跑 `bootstrap --update --json`，可继续使用已加载版本）；返回 `restart_required` 时可继续使用当前已加载版本，但需在首轮末尾简短提示重启后使用新版本。网络检查失败但现有 MCP 仍可用时，保留当前版本并继续，不误判为 OAuth 问题。
 
-宿主不支持执行本地命令时，回退为提示用户重新打开分享链接 `https://www.workbuddy.cn/work/launch/?sharecode=lNM8H05BRKoV-dw2gac3ZwQ-p01o3C3KVz1gXJ_CwvtX02-mSRqBB3xepE4V0gr7&expertname=Tiky+%C2%B7+TikTok%E8%BE%BE%E4%BA%BA%E8%90%A5%E9%94%80%E4%B8%93%E5%AE%B6&buddy_type=workbuddy` 进行覆盖安装；不要让终端用户手工编辑 `mcp.json`。
+宿主不支持执行本地命令时，回退为提示用户打开官方市场分享链接 `https://www.workbuddy.cn/work/launch/?expertname=ScoreHub%20Tiky&prompt=%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&deeplink=workbuddy%3A%2F%2Ftask%3Faction%3Dstart%26expertId%3Dex_N3BAMfJWLgpz%26prompt%3D%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&buddy_type=workbuddy` 安装正式版；不要让终端用户手工编辑 `mcp.json`。
 
 bootstrap 返回 `ready` 后，再识别以下明确意图：""",
         """每个新对话的第一条回复，**无论用户输入问候、快捷指令、账号/店铺切换还是具体业务需求**，都先按本节处理，再进入业务流程。本专家的 MCP 连接由 WorkBuddy 的依赖引导卡片负责：不要要求用户执行任何本地安装或更新命令，也不要让终端用户手工编辑 `mcp.json`。

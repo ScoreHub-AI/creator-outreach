@@ -1,5 +1,23 @@
 # @scorehub/creator-outreach
 
+## 1.12.1
+
+### Patch Changes
+
+- Align reply task tracing with the saved ExtendSendTask relation. Prefer the creator's stored send records for historical-message questions, keep current configuration and backfilled content distinct, and require reliable message links before attributing chat content to a task or notification.
+- Include the Agent supplement and shared references in expert ZIPs, and reject packages with missing runtime references.
+
+## 1.12.0
+
+### Minor Changes
+
+- Add Poland (PL), Czechia (CZ), and Portugal (PT), expanding Tiky's supported-market boundary to 19 countries. Align the Agent, product and listing summaries, generated delivery variants, and market regression coverage. Platform-managed credentials and existing outreach language remain unchanged.
+
+### Added
+
+- Add the `scorehub-sample-lookup`, `scorehub-creator-message-lookup`, and `scorehub-email-lookup` Skills for sample-application, creator reply/chat, and email lookups. Each Skill ships its own `references/tools-and-fields.md` and links to the shared quick-lookup contract, identifier, and T12/T14/T39 support references.
+- Add the Agent quick-lookup supplement for trusted scope, shared request budget, continuation, waiting/recovery, stop conditions, and effect boundaries. Register eight Skills in the plugin manifest and Agent frontmatter, and extend the local self-test regression to cover the new references and `-dev` Skill IDs.
+
 ## 1.11.0
 
 ### Minor Changes
