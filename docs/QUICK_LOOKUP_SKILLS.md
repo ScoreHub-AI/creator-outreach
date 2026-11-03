@@ -1,6 +1,6 @@
 # 随手查 3 个 Skill 与 Agent 补充（一期 B4）
 
-> 最近修订：T-0019 ｜ 更新：2026-10-29
+> 最近修订：T-0020 ｜ 更新：2026-11-03
 > 一期计划：[TIKY_QUERY_PHASE1_PLAN.md](../../../docs/TIKY_QUERY_PHASE1_PLAN.md)
 > 需求来源：`reference/requirements/一期需求整理/Skill交付内容/`
 
@@ -30,6 +30,8 @@ B4 把一期随手查能力接入 creator-outreach，不新增业务工具，也
 | Agent 补充 / References | 跨工具预算、续查、等待/恢复、编号关系、T12/T14/T39 字段 | 重复 Agent 的授权与首轮引导 |
 
 Skill 通过相对链接读取共享 Reference 和 Agent 补充；不在每个 Skill 复制 10 次/30 秒、退避或 `effects` 全表。Agent 只保留用户可理解的能力摘要和边界，不复制领域字段映射。
+
+样品查询不提供可靠库存判断；其输出字段及使用边界由[样品字段参考](../skills/scorehub-sample-lookup/references/tools-and-fields.md#清单结果与计数)维护，配套实现见 mcp-remote 的[申样工具文档](../../mcp-remote/docs/TIKY_SAMPLE_TOOLS.md)。Skill 仅保留简短边界，字段裁剪与数值分支不复制到 Agent 或产品摘要。
 
 ## 3. 注册与安装
 
@@ -63,6 +65,7 @@ npm test -w packages/creator-outreach
 
 - `plugin.json`、Agent frontmatter、8 个 `SKILL.md` 的名称和路径一致；
 - 三个 Skill 的触发条件、工具名、只读边界和共享规则链接；
+- 样品字段排除契约只在字段 Reference 完整维护；Skill/Agent 摘要不重新引入原字段及库存解释，专家 zip 中的样品 Skill/Reference 与源码一致；
 - Agent 的三组路由、六大能力摘要、8 个 Skill 引用；
 - 共享 Reference 的 `read_status`/`coverage`/`effects`/`continuation_token`、编号区别、T12/T14/T39 边界；
 - 所有包内相对链接可解析，不携带指向 `reference/` 的失效链接；

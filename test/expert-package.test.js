@@ -41,6 +41,8 @@ test('expert ZIP ships the current quick-lookup contracts and a generated platfo
     'agents/references/quick-lookup/common-contract.md',
     'agents/references/quick-lookup/identifiers-and-relations.md',
     supportPath,
+    'skills/scorehub-sample-lookup/SKILL.md',
+    'skills/scorehub-sample-lookup/references/tools-and-fields.md',
     'skills/scorehub-creator-message-lookup/SKILL.md',
     'skills/scorehub-creator-message-lookup/references/tools-and-fields.md',
   ]) {

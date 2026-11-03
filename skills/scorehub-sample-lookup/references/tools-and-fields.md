@@ -44,7 +44,9 @@
 
 ### 清单结果与计数
 
-`data.result` 保留 `total/page/size/tabCounts/groups`。各组保留 `groupKey`、达人标识、`applicationCount/statusSummary/applications` 及已有字段/空值。
+`data.result` 保留 `total/page/size/tabCounts/groups`。各组保留 `groupKey`、达人标识、`applicationCount/statusSummary/applications` 及未被排除的已有字段/空值。
+
+T01 的 `data.result.groups[].applications[]` 与 T02 的 `data.result.application` 均排除上游 `availableQuantity` 字段：无论源值为 0、正数、null 或其他值，输出都不包含该键；源字段缺失时也不补造。此字段不作为库存或申请件数依据，不展示、不汇总，也不据此推断有货/缺货或给出基于库存的审批建议。样品查询不提供可靠库存数据；用户问库存时说明当前查询无法确认，不将字段被屏蔽或缺失解释为库存为零。
 
 | 字段/信息 | 使用方式与限制 |
 | --- | --- |
@@ -58,7 +60,6 @@
 | `approveExpirationTime/shipmentExpirationTime` | 分别审核/发货截止，可空；无原生截止筛选/排序 |
 | `isApprovable/disapprovableReasons` | 当时可批准标志及返回原因；空不等于false，原因空不猜 |
 | `detailIncomplete` | 已有资料不完整标志；不据此自动 expand 或补同步 |
-| `availableQuantity` | 可用样品库存，不是达人申请数量 |
 
 普通首批源取20个达人组；不要求聊天一次展示完20组。已取未展示数据优先续接，不能直接翻页跳过。源 `page/size/total` 与真实记录判断分页；重复页、计数矛盾或数据变化须说明，不能仅凭空页证明官方全历史完整。无固定快照保证。复筛后不得沿用未复筛计数，未读完只报已读范围内发现的记录。
 
@@ -68,7 +69,7 @@
 
 输入仅 `application_id:string` 必填，映射 `applicationId`，必须是用户明确提供的真实平台申请编号或已读记录。即使申请已发货/完成，也不套 T01 的待审核或日期默认。
 
-`data.result` 保留 `application/reviews`。申请详情按已有字段保留平台申请、达人账号/昵称、商品规格、状态、截止、可批准标志/原因及资料完整性；按卖家问题展示，不无差别倾倒所有字段。
+`data.result` 保留 `application/reviews`。申请详情按已有字段保留平台申请、达人账号/昵称、商品规格、状态、截止、可批准标志/原因及资料完整性；申请对象遵循第2节的字段排除契约。按卖家问题展示，不无差别倾倒所有字段。
 
 | 字段/信息 | 解释边界 |
 | --- | --- |

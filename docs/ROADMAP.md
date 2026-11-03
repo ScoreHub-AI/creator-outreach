@@ -5,7 +5,7 @@
 ## 已完成
 
 - [x] **品牌定位、市场覆盖与对外口径统一**: 覆盖含波兰、捷克、葡萄牙的 19 国，同步 Agent、产品摘要、插件与上架/自测变体；市场边界与交付回归通过，沿用现有语言和建联话术。真实环境与发布核实见 [市场扩展方案](../../../docs/TIKY_MARKET_EXPANSION.md)。
-- [x] **一期 B4：随手查 3 个 Skill、Agent 补充与安装回归**: 交付三组查询 Skill、共享 Reference、Agent 路由和安装支持；对齐 S13 任务追溯与内容来源，修复专家 zip 遗漏共享契约并补充产物回归，78 项包内测试通过。见 [随手查交付](./QUICK_LOOKUP_SKILLS.md)。
+- [x] **一期 B4：随手查 3 个 Skill、Agent 补充与安装回归**: 交付三组查询 Skill、共享 Reference、Agent 路由和安装支持；对齐 S13 任务追溯与内容来源、样品查询库存边界，修复专家 zip 遗漏共享契约并覆盖样品正文交付，79 项包内测试通过。见 [随手查交付](./QUICK_LOOKUP_SKILLS.md)。
 
 - [x] **Tiky 第五 Skill：本店联盟经营数据分析**: 迁移产品 DSH 版 `tiktok-affiliate-analytics` 的一期范围与 References，完成 WorkBuddy Skill 注册、Agent 能力引导、分析路由、只读报告契约、上架摘要、包内自包含契约与本地自测加载路径；两个未列入 OpenAPI 的 `/analysis/` 接口按用户确认以可用为前提接入，部署状态保留为联调核实项（2026-09-18）。
 - [x] **WorkBuddy 开放平台专家上架交付包**: 收敛 `plugin.json` 展示字段（3 个 tags、3 个 quickPrompts、40–50 字描述、512×512 头像），新增 `listing/`（根 `.mcp.json` 依赖声明 + 随包产品摘要 README）与 `scripts/`（从权威正文生成剥离 bootstrap 门禁的上架版 Agent 正文、字段校验与纯净打包）；测试补齐字数与标签口径断言，以及「权威正文保留分享链接门禁 / 上架版剥离该门禁」双向断言。同时为 `pack-expert.sh` 增加上架基线守卫，强制「包内无未提交改动 + HEAD 已打 tag」后才允许出包（`--skip-baseline-check` 仅作本地排查逃生开关），确保每次提审的 zip 均可追溯到不可变基线（2026-09-11）。

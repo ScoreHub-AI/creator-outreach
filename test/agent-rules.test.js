@@ -766,6 +766,24 @@ test('routes sample, reply/chat and email requests through their domain skills',
   }
 });
 
+test('owns sample inventory field exclusions in the reference and keeps summaries free of field rules', () => {
+  const listContract = getMarkdownSection(sampleFields, '## 2. T01 清单输入');
+  const detailContract = getMarkdownSection(sampleFields, '## 3. T02 详情及CRM只读关联输入与结果');
+  assert.match(listContract, /T01 的 `data\.result\.groups\[\]\.applications\[\]` 与 T02 的 `data\.result\.application` 均排除上游 `availableQuantity` 字段/);
+  assert.match(listContract, /无论源值为 0、正数、null 或其他值，输出都不包含该键；源字段缺失时也不补造/);
+  assert.match(listContract, /不展示、不汇总，也不据此推断有货\/缺货或给出基于库存的审批建议/);
+  assert.match(listContract, /用户问库存时说明当前查询无法确认/);
+  assert.match(detailContract, /申请对象遵循第2节的字段排除契约/);
+  assert.doesNotMatch(sampleFields, /\|\s*`availableQuantity`\s*\|/);
+  assert.doesNotMatch(sampleFields + sampleSkill, /可用样品库存/);
+  assert.match(sampleSkill, /样品查询不提供可靠库存数据/);
+  assert.match(sampleSkill, /不依据申请记录判断有货或缺货/);
+  assert.match(sampleSkill, /\.\/references\/tools-and-fields\.md#清单结果与计数/);
+  for (const summary of [sampleSkill, agent, lookupAdditions, packageReadme, packageReadmeEn, listingReadme]) {
+    assert.doesNotMatch(summary, /availableQuantity/);
+  }
+});
+
 test('keeps quick-lookup triggers, tool names and read boundaries in the skills', () => {
   assert.match(sampleSkill, /get_sample_application_detail/);
   assert.match(sampleSkill, /不审批/);

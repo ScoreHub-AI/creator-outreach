@@ -1,5 +1,11 @@
 # @scorehub/creator-outreach
 
+## 1.12.2
+
+### Patch Changes
+
+- fix(tiky): hide sample available quantity from tool output (T-0020)
+
 ## 1.12.1
 
 ### Patch Changes

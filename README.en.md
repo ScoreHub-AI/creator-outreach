@@ -21,7 +21,7 @@ Tiky's official release channel is the WorkBuddy marketplace (open-platform list
 1. Install WorkBuddy and launch it at least once
 2. Open the official marketplace share link in a browser so it launches WorkBuddy and installs Tiky:
 
-   `https://www.workbuddy.cn/work/launch/?expertname=ScoreHub%20Tiky&prompt=%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&deeplink=workbuddy%3A%2F%2Ftask%3Faction%3Dstart%26expertId%3Dex_N3BAMfJWLgpz%26prompt%3D%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&buddy_type=workbuddy`
+   [Open the WorkBuddy marketplace to install Tiky](https://www.workbuddy.cn/work/launch/?expertname=ScoreHub%20Tiky&prompt=%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&deeplink=workbuddy%3A%2F%2Ftask%3Faction%3Dstart%26expertId%3Dex_N3BAMfJWLgpz%26prompt%3D%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&buddy_type=workbuddy)
 
 3. Return to WorkBuddy and open the "ScoreHub Tiky" conversation
 
