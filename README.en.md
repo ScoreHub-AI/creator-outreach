@@ -124,6 +124,8 @@ Ask Tiky:
 
 WorkBuddy's dependency guidance card owns the MCP connection. Fully quit and reopen WorkBuddy, then try again. If the tools remain unavailable, open the plugin management page and confirm that Tiky is installed and the `scorehub` dependency is connected.
 
+Until the dependency recovers, Tiky never fabricates creator lists or send results. She delivers a plan covering the capability state, what was not executed this turn, a screening and outreach plan, and a recovery checklist, marking every number as coming from your conditions or from platform limits. The next turn can resume directly from that plan.
+
 ### npm channel: no supported client found
 
 Install and launch WorkBuddy once, then rerun the npm-channel install command; the installer exits without writing anything when `~/.workbuddy/` is absent.

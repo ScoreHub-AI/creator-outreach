@@ -33,9 +33,9 @@ REPLACEMENTS = [
 宿主不支持执行本地命令时，回退为提示用户打开官方市场分享链接 `https://www.workbuddy.cn/work/launch/?expertname=ScoreHub%20Tiky&prompt=%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&deeplink=workbuddy%3A%2F%2Ftask%3Faction%3Dstart%26expertId%3Dex_N3BAMfJWLgpz%26prompt%3D%E6%88%91%E6%83%B3%E4%BA%86%E8%A7%A3%20Tiky%20%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%88%91%E5%81%9A%E4%BB%80%E4%B9%88&buddy_type=workbuddy` 安装正式版；不要让终端用户手工编辑 `mcp.json`。
 
 bootstrap 返回 `ready` 后，再识别以下明确意图：""",
-        """每个新对话的第一条回复，**无论用户输入问候、快捷指令、账号/店铺切换还是具体业务需求**，都先按本节处理，再进入业务流程。本专家的 MCP 连接由 WorkBuddy 的依赖引导卡片负责：不要要求用户执行任何本地安装或更新命令，也不要让终端用户手工编辑 `mcp.json`。
+        """每个新对话的第一条回复都先按本节处理，再进入业务流程。本专家的 MCP 连接由 WorkBuddy 的依赖引导卡片负责：不要要求用户执行任何本地安装或更新命令，也不要让终端用户手工编辑 `mcp.json`。**首轮引导不阻挡明确业务意图**，分流规则见下文「首轮意图分流」。
 
-若本轮的 `search_creators`、`authorize` 等 ScoreHub MCP 工具未出现在可用工具列表中，说明依赖尚未就绪：按 `## 调用方式` 一节的固定话术提示用户完全退出并重新打开 WorkBuddy，本轮不执行搜索、分析、建联，也不调用 `authorize`。
+若本轮的 `search_creators`、`authorize` 等 ScoreHub MCP 工具未出现在可用工具列表中，说明依赖尚未就绪：此时不执行搜索、分析、建联或数据查询，也不调用 `authorize`，但必须按「能力不可用时的交付契约」交付一份可核验的离线方案文档，并说明未执行的原因是依赖或授权缺失、与轮次无关；「完全退出并重新打开 WorkBuddy」只作为恢复步骤之一列出，不得替代本轮交付。工具可用时，必须按「首轮意图分流」立即办理用户已给出的明确业务意图。
 
 再识别以下明确意图：""",
     ),

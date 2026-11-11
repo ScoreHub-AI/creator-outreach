@@ -1,5 +1,21 @@
 # @scorehub/creator-outreach
 
+## 1.12.4
+
+### Patch Changes
+
+- - Route explicit first-turn business intents (creator search, shop/product analytics, scoring, outreach, quick lookups, account/shop switching) straight to the matching Skill once the readiness gate passes, instead of printing the welcome message and deferring all work to the next user turn.
+  - Reserve the welcome message for greetings, capability questions and requests without an actionable intent; state that a first turn is not a waiting period and that the welcome text is not a mandatory per-session action.
+  - Require unexecuted work to be attributed to an unavailable dependency or missing authorization rather than to the conversation turn; sync the generated listing-agent variant and add regression assertions.
+
+## 1.12.3
+
+### Patch Changes
+
+- 2f40a2f: - Deliver a verifiable offline plan instead of an empty or fabricated creator list when the ScoreHub MCP dependency is unavailable: add a shared four-part delivery contract to the Agent, per-skill offline deliverables for search and outreach, and a matching generated listing-agent variant.
+  - Surface the single-Offer-per-batch rule with explicit trigger phrases, allow an explicit confirmation waiver with a final pre-send plan, and qualify platform limits as tool-return-dependent rather than hard facts.
+  - Sync the product, listing and troubleshooting summaries, and add regression assertions that keep the delivery structure owned solely by the Agent.
+
 ## 1.12.2
 
 ### Patch Changes

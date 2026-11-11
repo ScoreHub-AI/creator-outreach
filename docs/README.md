@@ -8,7 +8,7 @@
 
 - **Agent 权威规范**：[`../agents/tiktok-creator-outreach.md`](../agents/tiktok-creator-outreach.md)
   - 唯一的共享行为规范来源
-  - 定义首轮引导、授权与切换、统一错误分流、本地运行环境恢复、市场与配额边界
+  - 定义首轮引导与意图分流、授权与切换、统一错误分流、能力不可用时的交付契约、本地运行环境恢复、市场与配额边界
 - **Skill 专项规则**：
   - [`../skills/tiktok-creator-search/SKILL.md`](../skills/tiktok-creator-search/SKILL.md)
   - [`../skills/tiktok-creator-analysis/SKILL.md`](../skills/tiktok-creator-analysis/SKILL.md)
@@ -55,6 +55,7 @@ Tiky 是 ScoreHub AI 面向 TikTok Shop 卖家的达人营销专家。其核心�
 
 - **Agent 定义**：智能体身份、首轮欢迎语、工具使用边界和统一行为规则
 - **Skills**：搜索、评分、建联、相似达人、数据分析，以及样品申请、达人回复/聊天、邮件查询八个能力入口及各自专项契约
+- **依赖未就绪时的交付**：Agent 定义四段交付结构与禁止虚构数值的边界，搜索 / 建联 Skill 各自声明本领域的离线可交付项；建联 Skill 另维护「明确免确认豁免」与「离线交付单一 Offer 候选」两条口径，唯一权威来源为 [`../skills/tiktok-batch-outreach/SKILL.md`](../skills/tiktok-batch-outreach/SKILL.md)。开放平台质检归因与复评沟通口径见 [`../../../docs/WORKBUDDY_QC_REVIEW_1_12_4.md`](../../../docs/WORKBUDDY_QC_REVIEW_1_12_4.md)。
 - **插件元数据**：WorkBuddy 插件清单、展示名、头像、快捷入口
 - **安装器**：默认只写入 `@scorehub/mcp-server` 的 MCP 配置；`bootstrap --dev` 时额外把专家副本写入 WorkBuddy 本地通道（npm 预览 / 备用 / 仓库自测）
 - **npm 渠道引导**：npm 副本在每个新会话强制执行 bootstrap 状态门禁，首次确认后预拉取并自检 `mcp-server@latest`，后续静默更新 creator-outreach，并仅在明确证据下恢复 Node.js LTS；官方市场版无此门禁（MCP 由平台依赖引导卡片负责）
@@ -67,7 +68,7 @@ Tiky 是 ScoreHub AI 面向 TikTok Shop 卖家的达人营销专家。其核心�
 - 不保存消息、回复或运营数据
 - 不实现消息监听、A/B 回复率追踪或导出
 - 不提供定时或跨时区建联调度
-- 不提供绕过 ScoreHub MCP 的直连降级路径
+- 不提供绕过 ScoreHub MCP 获取真实达人数据的直连降级路径；依赖未就绪时只交付离线方案，不产出达人数据
 - 不审批/拒绝样品申请、不寄样、不发信/回复、不建合作、不导出或写同步；查询中的刷新、标读、补存等附带动作按对应 Skill 说明
 
 ## 能力概览

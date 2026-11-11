@@ -153,7 +153,7 @@ SKIP_BASELINE_CHECK=0
 for arg in "$@"; do
   case "$arg" in
     --skip-baseline-check) SKIP_BASELINE_CHECK=1 ;;
-    *) fail "未知参数: $arg（仅支持 --skip-baseline-check）" ;;
+    *) fail "未知参数: ${arg}（仅支持 --skip-baseline-check）" ;;
   esac
 done
 
@@ -187,7 +187,7 @@ else
     BASELINE="$(awk '{ print $2 }' <<<"$TAGS_AT_HEAD" | paste -sd, -)（轻量 tag，建议改用 git tag -a）"
   fi
   grep -qF "$VERSION" <<<"$TAGS_AT_HEAD" || \
-    echo "警告: HEAD 上的 tag（$BASELINE）不含当前版本号 $VERSION，请确认打的是同一基线。" >&2
+    echo "警告: HEAD 上的 tag（${BASELINE}）不含当前版本号 ${VERSION}，请确认打的是同一基线。" >&2
   echo "上架基线: $(gitpkg rev-parse --short HEAD) @ $BASELINE"
 fi
 
@@ -255,7 +255,7 @@ fi
 if grep -rIin -e 'sharecode' -e '@scorehub/creator-outreach@latest' -e 'bootstrap' "$TREE_DIR" >/dev/null 2>&1; then
   LEAKED="$LEAKED 分享链接安装路径痕迹(bootstrap/sharecode)"
 fi
-[[ -z "$LEAKED" ]] || fail "打包结果存在$LEAKED，请清理后重试"
+[[ -z "$LEAKED" ]] || fail "打包结果存在${LEAKED}，请清理后重试"
 
 # --------------------------------------------------------------- 4. 生成 zip
 mkdir -p "$OUT_DIR"

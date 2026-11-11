@@ -589,6 +589,16 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
     assert.match(variant, /不是海量群发工具/);
     assert.match(variant, /`switch_shop`/);
     assert.match(variant, /ScoreHub 服务暂时未连接/);
+    // 依赖未就绪时的交付契约必须随上架版分发，且不能再退回「只给重开话术」
+    assert.match(variant, /## 能力不可用时的交付契约/);
+    assert.match(variant, /按「能力不可用时的交付契约」交付一份可核验的离线方案文档/);
+    assert.match(variant, /不得替代本轮交付/);
+    assert.match(variant, /首轮引导不阻挡明确业务意图/);
+    assert.match(variant, /### 首轮意图分流（先于欢迎语判断）/);
+    assert.match(variant, /工具可用时，必须按「首轮意图分流」立即办理/);
+    assert.doesNotMatch(variant, /从下一条消息开始，按本文件已有的授权/);
+    assert.match(variant, /11\. \*\*整批单一 Offer\*\*/);
+    assert.doesNotMatch(variant, /按 `## 调用方式` 一节的固定话术提示用户完全退出/);
     assert.match(variant, /当前覆盖 19 个国家市场/);
     assert.match(variant, /波兰（PL）、捷克（CZ）、葡萄牙（PT）/);
     assert.equal(
@@ -931,4 +941,108 @@ test('documents the quick-lookup skill set in the package docs', () => {
   assert.match(packageReadmeEn, /sample application/i);
   assert.match(packageReadmeEn, /creator replies/i);
   assert.match(packageReadmeEn, /email records/i);
+});
+
+// 开放平台质检驳回修复：依赖未就绪时不得交白卷，也不得为凑表格格式编造达人数据。
+// Agent 是四段交付结构的唯一 owner；两个 Skill 只声明本领域离线可交付项，反向断言防止结构回流。
+test('defines the shared degraded-delivery contract as the single owner', () => {
+  const section = getMarkdownSection(agent, '## 能力不可用时的交付契约');
+  assert.match(section, /不执行任何搜索、分析、建联或随手查工具调用/);
+  assert.match(section, /\*\*能力状态\*\*/);
+  assert.match(section, /\*\*本轮未执行项\*\*/);
+  assert.match(section, /\*\*离线可交付方案\*\*/);
+  assert.match(section, /\*\*恢复清单与待执行计划\*\*/);
+  assert.match(section, /禁止生成达人表、表头示例、示例行、占位数值或标注为「示例」的达人数据/);
+  assert.match(section, /平台约束，实际以工具返回为准/);
+  assert.match(section, /本节是共享行为的唯一权威来源/);
+  assert.match(section, /不能替代本轮交付/);
+  assert.match(agent, /ScoreHub 依赖未就绪时的交付边界以本文件「能力不可用时的交付契约」为唯一权威来源/);
+  assert.match(agent, /按「能力不可用时的交付契约」交付本轮方案文档/);
+  assert.match(searchSkill, /四段交付结构遵循 Agent/);
+  assert.match(outreachSkill, /按 Agent 的「能力不可用时的交付契约」交付/);
+  assert.doesNotMatch(searchSkill, /1\. \*\*能力状态\*\*/);
+  assert.doesNotMatch(outreachSkill, /1\. \*\*能力状态\*\*/);
+});
+
+test('replaces sample creator rows with a real offline search plan', () => {
+  const section = getMarkdownSection(searchSkill, '## 工具不可用时的离线交付');
+  assert.match(section, /不生成达人列表、表头、示例行、占位数值或空表/);
+  assert.match(section, /筛选口径/);
+  assert.match(section, /数量与分页计划/);
+  assert.match(section, /结果格式预告/);
+  assert.match(section, /恢复后的验证顺序/);
+  assert.match(section, /口红等深层词需上卷到顶层或所属直接子类目/);
+  assert.match(section, /不得为了凑齐表格格式编造昵称、GMV、粉丝数或达人 ID/);
+  assert.match(section, /不得把方案表述为「搜索结果」或「已筛选名单」/);
+  assert.match(searchSkill, /工具不可用不属于搜索专属错误分支/);
+  assert.match(searchSkill, /结果为空时不生成空表/);
+  assert.match(searchSkill, /未找到符合条件的达人/);
+});
+
+test('surfaces the single-Offer-per-batch rule with explicit trigger phrases', () => {
+  assert.match(agent, /11\. \*\*整批单一 Offer\*\*/);
+  assert.match(agent, /话术正文可轮换但 Offer 不可轮换/);
+  assert.match(agent, /三组轮着来/);
+  assert.match(agent, /必须显式援引本条/);
+  const section = getMarkdownSection(outreachSkill, '### 整批单一 Offer（硬约束）');
+  assert.match(section, /同一批达人只能选择一种 Offer 承诺/);
+  assert.match(section, /商业承诺必须整批一致/);
+  assert.match(section, /不得只从「无法归因」「测试设计」等角度回应/);
+  assert.match(section, /A\/B 测试不同条件/);
+  assert.match(section, /单 Offer 多套文案/);
+  assert.match(outreachSkill, /整批单一 Offer 约束见上节，不在此重复/);
+  assert.match(outreachSkill, /不得声称已创建会话或已发送/);
+  assert.doesNotMatch(outreachSkill, /i % 3|取模/);
+  assert.match(messageTemplates, /同一批达人始终使用同一个已确认 Offer/);
+});
+
+test('allows an explicit confirmation waiver and qualifies platform limits as tool-return-dependent', () => {
+  assert.match(agent, /用户明确表示「不用确认」「直接发」时不再往返索要确认/);
+  assert.match(agent, /真实发送前仍须一次性列出名单、话术与规模/);
+  assert.match(agent, /只输出计划并说明未发送，不得声称已发送/);
+  const limits = getMarkdownSection(agent, '## 限制与注意事项');
+  assert.match(limits, /实际剩余量以工具返回为准/);
+  assert.match(limits, /不得把「并发必然触发限流」当作既定事实/);
+  assert.match(limits, /不据此推断某批名单是否合格/);
+  assert.match(limits, /具体上限以工具返回为准/);
+});
+
+// 质检 1.12.4 点名的两处冲突：Agent 的免确认豁免被 Skill 优先级覆盖、离线交付并列 A/B Offer。
+test('keeps the confirmation waiver and single-Offer wording owned by the outreach skill', () => {
+  assert.match(outreachSkill, /发送前\*\*必须\*\*与用户确认/);
+  assert.match(outreachSkill, /\*\*明确豁免\*\*/);
+  assert.match(outreachSkill, /不再往返索要上述四项决策/);
+  assert.match(outreachSkill, /不取消「整批单一 Offer」/);
+  assert.match(outreachSkill, /三个选项只用于\*\*择一\*\*/);
+  assert.match(outreachSkill, /单一 Offer 候选/);
+  assert.match(outreachSkill, /不得并列 A\/B 两套待选/);
+  assert.match(docsReadme, /明确免确认豁免/);
+  assert.match(docsReadme, /离线交付单一 Offer 候选/);
+});
+
+test('mirrors the degraded-delivery summary in product and listing docs', () => {
+  assert.match(docsReadme, /能力不可用时的交付契约/);
+  assert.match(docsReadme, /依赖未就绪时的交付/);
+  assert.match(docsReadme, /不提供绕过 ScoreHub MCP 获取真实达人数据的直连降级路径/);
+  assert.match(packageReadme, /交付一份包含能力状态、本轮未执行项、筛选与建联方案、恢复清单的方案文档/);
+  assert.match(packageReadmeEn, /never fabricates creator lists or send results/);
+  assert.match(listingReadme, /依赖未就绪时，Tiky 不编造达人名单或发送结果/);
+  assert.match(listingReadme, /依赖未就绪时不生成达人表格、示例行或占位数值/);
+});
+
+// 首轮引导不得吞掉明确业务意图：门禁只保证环境可用，不决定要不要办事。
+test('routes an explicit first-turn business intent straight to execution', () => {
+  const section = getMarkdownSection(agent, '## 新会话首轮引导（最高优先级）');
+  assert.match(section, /### 首轮意图分流（先于欢迎语判断）/);
+  assert.match(section, /门禁 \/ 依赖检查只保证环境可用.*不决定是否办理业务/);
+  assert.match(section, /立即按对应 Skill 执行/);
+  assert.match(section, /不输出欢迎语、不追加「想从哪一步开始？」、不等待下一条消息/);
+  assert.match(section, /首轮不是业务操作的等待期/);
+  assert.match(section, /原因是依赖不可用或授权缺失/);
+  assert.match(section, /不得把未执行归因于轮次、会话阶段或流程/);
+  assert.match(section, /仅当命中上述第 2 类时，首轮使用以下完整中文欢迎语/);
+  assert.match(agent, /未命中明确业务意图时，首轮回复结束后等待用户下一条消息/);
+  assert.doesNotMatch(agent, /从下一条消息开始，按本文件已有的授权/);
+  assert.doesNotMatch(agent, /按首轮流程|首轮暂未调用/);
+  assert.match(docsReadme, /首轮引导与意图分流/);
 });
