@@ -1,7 +1,7 @@
 {
   "name": "tiktok-creator-outreach",
-  "version": "1.12.4",
-  "description": "ScoreHub AI's TikTok creator marketing expert for building clear creator profiles and validating focused collaboration shortlists across 19 markets in Southeast Asia, the United States, Europe, Japan, Brazil, and Mexico.",
+  "version": "1.12.5",
+  "description": "ScoreHub AI's TikTok creator marketing expert for building clear creator profiles and validating focused collaboration shortlists across 24 markets in Southeast Asia, the United States, Europe, Japan, Brazil, and Mexico.",
   "author": {
     "name": "Ben",
     "email": "bennyworks@foxmail.com"
@@ -19,6 +19,9 @@
     "./skills/scorehub-creator-message-lookup",
     "./skills/scorehub-email-lookup"
   ],
+  "dependencies": {
+    "connectors": ["scorehub-tiktok"]
+  },
   "expertType": "agent",
   "agentName": "tiktok-creator-outreach",
   "displayName": {

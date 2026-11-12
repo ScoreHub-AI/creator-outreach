@@ -1,5 +1,16 @@
 # @scorehub/creator-outreach
 
+## Unreleased
+
+- Add Belgium (BE), the Netherlands (NL), Austria (AT), Greece (GR), and Hungary (HU), expanding Tiky's supported-market boundary to 24 countries. Align the Agent, product and listing summaries, plugin description, and generated listing/dev variants; extend regressions for platform authorization, shop-local categories, and actual Rank currencies.
+
+## 1.12.5
+
+### Patch Changes
+
+- Use the published ScoreHub TikTok Creator Marketing connector for the marketplace expert, remove the embedded MCP configuration, and reject stale or mixed dependency declarations during packaging.
+- Keep npm self-test copies on their bootstrap connection by removing marketplace connector dependencies from the staged manifest and cache. Update connection guidance and cover the resulting ZIP and channel isolation with regressions.
+
 ## 1.12.4
 
 ### Patch Changes

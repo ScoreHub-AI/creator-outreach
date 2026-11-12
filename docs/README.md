@@ -34,8 +34,8 @@
   - 官方市场入口（终端用户主渠道）与 npm 备用 / 预览 / 自测安装、bootstrap 状态机、Tiky 自升级、`mcp-server` 引导和环境恢复口径
 - **开放平台上架素材与交付口径**：
   - [`../listing/README.md`](../listing/README.md) 是随上架 zip 分发的产品摘要，不含本地安装命令
-  - [`../listing/.mcp.json`](../listing/.mcp.json) 是平台依赖声明（自包含 MCP，server key `scorehub`）
-  - [`../scripts/`](../scripts) 负责生成上架版 Agent 正文与打包，字段契约、打包清单与未完成项以顶层 [`../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md`](../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md) 为准
+  - [`./MARKETPLACE_DELIVERY.md`](./MARKETPLACE_DELIVERY.md) 是专家市场连接器依赖、打包校验与 npm 自测通道隔离的权威说明
+  - [`../scripts/`](../scripts) 负责生成上架版 Agent 正文与打包；跨包提审流程与基线以顶层 [`../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md`](../../../docs/WORKBUDDY_OPEN_PLATFORM_LISTING.md) 为准
 
 若不同文档表述不一致，共享行为以 Agent 为准，领域专项行为以对应 Skill 为准，字段、边界和模板细节以对应 Reference 为准。
 
@@ -59,7 +59,7 @@ Tiky 是 ScoreHub AI 面向 TikTok Shop 卖家的达人营销专家。其核心�
 - **插件元数据**：WorkBuddy 插件清单、展示名、头像、快捷入口
 - **安装器**：默认只写入 `@scorehub/mcp-server` 的 MCP 配置；`bootstrap --dev` 时额外把专家副本写入 WorkBuddy 本地通道（npm 预览 / 备用 / 仓库自测）
 - **npm 渠道引导**：npm 副本在每个新会话强制执行 bootstrap 状态门禁，首次确认后预拉取并自检 `mcp-server@latest`，后续静默更新 creator-outreach，并仅在明确证据下恢复 Node.js LTS；官方市场版无此门禁（MCP 由平台依赖引导卡片负责）
-- **开放平台上架素材**：上架版 Agent 正文（剥离 npm 渠道 bootstrap 门禁，由脚本从权威正文生成）、平台依赖声明 `.mcp.json`、随包产品摘要 README，以及字段校验与纯净打包脚本
+- **开放平台上架素材**：上架版 Agent 正文（剥离 npm 渠道 bootstrap 门禁，由脚本从权威正文生成）、市场连接器依赖声明、随包产品摘要 README，以及字段校验与纯净打包脚本
 - **测试**：校验品牌、安装行为以及关键规范是否仍由正确文档承载
 
 本包不承担以下职责：

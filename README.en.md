@@ -6,7 +6,7 @@ Chinese version: [README.md](./README.md)
 
 ## Supported Markets
 
-Tiky currently covers 19 country markets: Indonesia (ID), Thailand (TH), Malaysia (MY), Vietnam (VN), the Philippines (PH), Singapore (SG), the United States (US), the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), Ireland (IE), Poland (PL), Czechia (CZ), Portugal (PT), Japan (JP), Brazil (BR), and Mexico (MX). The Agent specification is authoritative for this market boundary.
+Tiky currently covers 24 country markets: Indonesia (ID), Thailand (TH), Malaysia (MY), Vietnam (VN), the Philippines (PH), Singapore (SG), the United States (US), the United Kingdom (GB), Germany (DE), Italy (IT), France (FR), Spain (ES), Ireland (IE), Poland (PL), Czechia (CZ), Portugal (PT), Belgium (BE), the Netherlands (NL), Austria (AT), Greece (GR), Hungary (HU), Japan (JP), Brazil (BR), and Mexico (MX). The Agent specification is authoritative for this market boundary.
 
 ## Supported Clients
 
@@ -25,7 +25,7 @@ Tiky's official release channel is the WorkBuddy marketplace (open-platform list
 
 3. Return to WorkBuddy and open the "ScoreHub Tiky" conversation
 
-The marketplace version requires no local install commands: WorkBuddy's dependency guidance card connects the MCP service, and users never edit `mcp.json` by hand. The first TikTok tool call opens ScoreHub login for shop authorization.
+The marketplace version uses the published ScoreHub TikTok Creator Marketing connector. When you summon Tiky, WorkBuddy guides you through connection, ScoreHub login, and shop authorization; connected dependencies do not prompt again. No local install commands or manual edits to `mcp.json` are required.
 
 ### npm channel (backup / preview / self-test)
 
@@ -122,7 +122,7 @@ Ask Tiky:
 
 ### Marketplace version: MCP tools are unavailable, the tool list is empty, or the connection closes
 
-WorkBuddy's dependency guidance card owns the MCP connection. Fully quit and reopen WorkBuddy, then try again. If the tools remain unavailable, open the plugin management page and confirm that Tiky is installed and the `scorehub` dependency is connected.
+WorkBuddy's dependency guidance card owns the MCP connection. Fully quit and reopen WorkBuddy, then try again. If the tools remain unavailable, confirm that Tiky is installed and check the connector page to ensure ScoreHub TikTok Creator Marketing is connected.
 
 Until the dependency recovers, Tiky never fabricates creator lists or send results. She delivers a plan covering the capability state, what was not executed this turn, a screening and outreach plan, and a recovery checklist, marking every number as coming from your conditions or from platform limits. The next turn can resume directly from that plan.
 

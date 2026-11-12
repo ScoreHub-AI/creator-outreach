@@ -217,7 +217,7 @@ test('keeps the welcome example and capability promises aligned with actual beha
   assert.doesNotMatch(outreachSkill, /9:00-21:00/);
 });
 
-test('keeps the 19-country market boundary authoritative in the agent', () => {
+test('keeps the 24-country market boundary authoritative in the agent', () => {
   const supportedMarkets = [
     ['泰国', 'Thailand', 'TH'],
     ['马来西亚', 'Malaysia', 'MY'],
@@ -235,23 +235,28 @@ test('keeps the 19-country market boundary authoritative in the agent', () => {
     ['波兰', 'Poland', 'PL'],
     ['捷克', 'Czechia', 'CZ'],
     ['葡萄牙', 'Portugal', 'PT'],
+    ['比利时', 'Belgium', 'BE'],
+    ['荷兰', 'Netherlands', 'NL'],
+    ['奥地利', 'Austria', 'AT'],
+    ['希腊', 'Greece', 'GR'],
+    ['匈牙利', 'Hungary', 'HU'],
     ['日本', 'Japan', 'JP'],
     ['巴西', 'Brazil', 'BR'],
     ['墨西哥', 'Mexico', 'MX'],
   ];
 
-  assert.equal((agent.match(/当前覆盖 19 个国家市场/g) || []).length, 2);
+  assert.equal((agent.match(/当前覆盖 24 个国家市场/g) || []).length, 2);
   const marketBoundary = agent.split('- **支持市场**：')[1].split('\n')[0];
   const marketCodes = [...marketBoundary.matchAll(/（([A-Z]{2})）/g)].map((match) => match[1]);
   assert.deepEqual(marketCodes, supportedMarkets.map(([, , code]) => code));
-  assert.equal(new Set(marketCodes).size, 19);
+  assert.equal(new Set(marketCodes).size, 24);
   const welcome = getMarkdownSection(agent, '> ## 支持的市场');
   const welcomeCodes = [...welcome.matchAll(/（([A-Z]{2})）/g)].map((match) => match[1]);
-  assert.equal(welcomeCodes.length, 19);
+  assert.equal(welcomeCodes.length, 24);
   assert.deepEqual([...welcomeCodes].sort(), [...marketCodes].sort());
   assert.match(marketBoundary, /用户明确提到其他市场时，主动说明不支持/);
-  assert.doesNotMatch(marketBoundary, /（NL）|（AU）/);
-  assert.doesNotMatch(agent, /其他市场（如[^）]*(?:日本|巴西|墨西哥|波兰|捷克|葡萄牙)/);
+  assert.doesNotMatch(marketBoundary, /（AU）|（CA）/);
+  assert.doesNotMatch(agent, /其他市场（如[^）]*(?:日本|巴西|墨西哥|波兰|捷克|葡萄牙|比利时|荷兰|奥地利|希腊|匈牙利)/);
   for (const [countryZh, countryEn, code] of supportedMarkets) {
     for (const source of [agent, packageReadme, listingReadme]) {
       assert.match(source, new RegExp(`${countryZh}（${code}）`));
@@ -262,20 +267,23 @@ test('keeps the 19-country market boundary authoritative in the agent', () => {
 
   assert.match(searchSkill, /支持市场 allowlist.*以 Agent.*唯一权威来源/);
   assert.doesNotMatch(searchSkill, /\| 国家 \| 代码 \|/);
-  assert.doesNotMatch(searchSkill, /日本（JP）|巴西（BR）|墨西哥（MX）|波兰（PL）|捷克（CZ）|葡萄牙（PT）|覆盖 \d+ 个国家/);
-  assert.match(pluginJson.description, /19 markets.*Southeast Asia.*United States.*Europe.*Japan.*Brazil.*Mexico/);
+  for (const [, , code] of supportedMarkets) {
+    assert.doesNotMatch(searchSkill, new RegExp(`（${code}）`));
+  }
+  assert.doesNotMatch(searchSkill, /覆盖 \d+ 个国家/);
+  assert.match(pluginJson.description, /24 markets.*Southeast Asia.*United States.*Europe.*Japan.*Brazil.*Mexico/);
   // 官方字段表要求 tags 固定 3 个，市场覆盖改由 description 承载（见上一行断言）
   assert.equal(pluginJson.tags.length, 3);
   for (const tag of pluginJson.tags) {
     assert.match(tag.en, /\S/);
     assert.match(tag.zh, /\S/);
   }
-  assert.match(packageReadme, /当前覆盖 19 个国家市场/);
-  assert.match(packageReadmeEn, /currently covers 19 country markets/);
-  assert.match(brochure, /19 个国家市场协同/);
-  assert.match(listingReadme, /覆盖 19 个国家市场/);
+  assert.match(packageReadme, /当前覆盖 24 个国家市场/);
+  assert.match(packageReadmeEn, /currently covers 24 country markets/);
+  assert.match(brochure, /24 个国家市场协同/);
+  assert.match(listingReadme, /覆盖 24 个国家市场/);
   for (const source of [agent, packageReadme, packageReadmeEn, brochure, listingReadme, pluginJson.description]) {
-    assert.doesNotMatch(source, /覆盖 16 个国家|covers 16 country markets|across 16 markets/);
+    assert.doesNotMatch(source, /覆盖 (?:16|19) 个国家|covers (?:16|19) country markets|across (?:16|19) markets/);
   }
 });
 
@@ -599,8 +607,9 @@ test('keeps the open-platform listing agent free of the share-link bootstrap pat
     assert.doesNotMatch(variant, /从下一条消息开始，按本文件已有的授权/);
     assert.match(variant, /11\. \*\*整批单一 Offer\*\*/);
     assert.doesNotMatch(variant, /按 `## 调用方式` 一节的固定话术提示用户完全退出/);
-    assert.match(variant, /当前覆盖 19 个国家市场/);
+    assert.match(variant, /当前覆盖 24 个国家市场/);
     assert.match(variant, /波兰（PL）、捷克（CZ）、葡萄牙（PT）/);
+    assert.match(variant, /比利时（BE）、荷兰（NL）、奥地利（AT）、希腊（GR）、匈牙利（HU）/);
     assert.equal(
       getMarkdownSection(variant, '## 限制与注意事项'),
       getMarkdownSection(agent, '## 限制与注意事项'),

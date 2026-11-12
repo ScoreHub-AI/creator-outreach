@@ -24,7 +24,7 @@
 
 ## 交付边界
 
-WorkBuddy 分享链接只负责将 Tiky 代码包安装到 WorkBuddy，不会在分享安装阶段同时配置 MCP Server。官方市场版的 MCP 由 WorkBuddy 依赖引导卡片负责连接，市场版 Agent 正文不包含 bootstrap 门禁。npm 渠道副本则保证以下边界：
+WorkBuddy 分享链接只负责将 Tiky 代码包安装到 WorkBuddy，不会在分享安装阶段同时配置 MCP Server。官方市场版使用已上架的 ScoreHub 连接器，由 WorkBuddy 依赖引导卡片负责连接与授权，市场版 Agent 正文不包含 bootstrap 门禁；专家交付与 npm 自测隔离见[专家交付说明](./MARKETPLACE_DELIVERY.md)。npm 渠道副本则保证以下边界：
 
 - 用户可以打开 Tiky 会话，但在 bootstrap 完成前不进入达人搜索、分析、建联或 OAuth。
 - 首次本地安装必须经用户明确确认；该确认同时授权后续静默更新 ScoreHub 本地引导。

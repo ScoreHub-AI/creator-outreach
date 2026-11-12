@@ -6,7 +6,7 @@ English version: [README.en.md](./README.en.md)
 
 ## 支持市场
 
-Tiky 当前覆盖 19 个国家市场：印度尼西亚（ID）、泰国（TH）、马来西亚（MY）、越南（VN）、菲律宾（PH）、新加坡（SG）、美国（US）、英国（GB）、德国（DE）、意大利（IT）、法国（FR）、西班牙（ES）、爱尔兰（IE）、波兰（PL）、捷克（CZ）、葡萄牙（PT）、日本（JP）、巴西（BR）和墨西哥（MX）。市场边界以 Agent 规范为准。
+Tiky 当前覆盖 24 个国家市场：印度尼西亚（ID）、泰国（TH）、马来西亚（MY）、越南（VN）、菲律宾（PH）、新加坡（SG）、美国（US）、英国（GB）、德国（DE）、意大利（IT）、法国（FR）、西班牙（ES）、爱尔兰（IE）、波兰（PL）、捷克（CZ）、葡萄牙（PT）、比利时（BE）、荷兰（NL）、奥地利（AT）、希腊（GR）、匈牙利（HU）、日本（JP）、巴西（BR）和墨西哥（MX）。市场边界以 Agent 规范为准。
 
 ## 支持的客户端
 
@@ -25,7 +25,7 @@ Tiky 的官方发布渠道是 WorkBuddy 官方市场（开放平台上架）。�
 
 3. 回到 WorkBuddy，打开 “ScoreHub Tiky” 对话
 
-官方市场版无需执行任何本地安装命令：MCP 服务由 WorkBuddy 的依赖引导卡片负责连接，也不需要手工编辑 `mcp.json`。首次 TikTok 工具调用时会打开浏览器引导登录 ScoreHub 并授权店铺。
+官方市场版使用已上架的「ScoreHub TikTok 达人营销」连接器。召唤 Tiky 时，WorkBuddy 会引导完成连接、ScoreHub 登录与店铺授权；已连接过的依赖不会重复引导。无需执行本地安装命令，也不需要手工编辑 `mcp.json`。
 
 ### npm 渠道（备用 / 预览 / 自测）
 
@@ -122,7 +122,7 @@ Token 缓存在 `~/.scorehub/`，不会被 bootstrap 或升级清除。
 
 ### 官方市场版：MCP 工具不可用、工具列表为空或连接已关闭
 
-MCP 连接由 WorkBuddy 依赖引导卡片负责。请完全退出并重新打开 WorkBuddy 后重试；仍不可用时，到插件管理页确认 Tiky 已安装且 `scorehub` 依赖已连接。
+MCP 连接由 WorkBuddy 依赖引导卡片负责。请完全退出并重新打开 WorkBuddy 后重试；仍不可用时，确认 Tiky 已安装，并在连接器页面检查「ScoreHub TikTok 达人营销」是否已连接。
 
 依赖恢复前，Tiky 不会编造达人名单或发送结果：她会交付一份包含能力状态、本轮未执行项、筛选与建联方案、恢复清单的方案文档，并标注所有数值来自你的条件或平台约束。连接恢复后可直接在下一轮按该计划续做。
 

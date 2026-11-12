@@ -226,11 +226,13 @@ test('bootstrap --dev activates the local self-test channel end to end', () => {
   assert.equal(devManifest.plugin, PLUGIN_NAME);
   assert.equal(devManifest.displayName.zh, DEV_DISPLAY_NAME.zh);
   assert.match(devManifest.description, /本地自测副本$/);
-  assert.match(devManifest.description, /across 19 markets/);
+  assert.match(devManifest.description, /across 24 markets/);
   assert.notEqual(PLUGIN_NAME, 'tiktok-creator-outreach');
   // agentName 与 agents/ 文件名保持原样，否则运行时会找不到 agent markdown。
   assert.equal(devManifest.agentName, 'tiktok-creator-outreach');
   assert.deepEqual(devManifest.agents, ['./agents/tiktok-creator-outreach.md']);
+  assert.equal(devManifest.dependencies, undefined);
+  assert.deepEqual(JSON.parse(originalManifest).dependencies, { connectors: ['scorehub-tiktok'] });
 
   // 2. 注册清单写进去了 —— 否则「我的专家」列表里根本没有这个条目。
   assert.equal(manifest.name, CUSTOM_EXPERT_MARKETPLACE);
@@ -247,6 +249,7 @@ test('bootstrap --dev activates the local self-test channel end to end', () => {
   ));
   assert.equal(cachedManifest.name, PLUGIN_NAME);
   assert.equal(cachedManifest.version, PACKAGE_VERSION);
+  assert.equal(cachedManifest.dependencies, undefined);
   const expectedProfession = {
     en: 'TikTok Creator Marketing Expert (local dev)',
     zh: 'TikTok 达人营销专家（本地自测）',
@@ -258,8 +261,9 @@ test('bootstrap --dev activates the local self-test channel end to end', () => {
     assert.match(devAgent, /profession:\n  en: "TikTok Creator Marketing Expert \(local dev\)"\n  zh: "TikTok 达人营销专家（本地自测）"/);
     assert.match(devAgent, /^name: tiktok-creator-outreach$/m);
     assert.match(devAgent, /我是 Tiky，ScoreHub AI 的 TikTok 达人营销专家。/);
-    assert.match(devAgent, /当前覆盖 19 个国家市场/);
+    assert.match(devAgent, /当前覆盖 24 个国家市场/);
     assert.match(devAgent, /波兰（PL）、捷克（CZ）、葡萄牙（PT）/);
+    assert.match(devAgent, /比利时（BE）、荷兰（NL）、奥地利（AT）、希腊（GR）、匈牙利（HU）/);
   }
   assert.equal(fs.readFileSync(sourceManifestPath, 'utf8'), originalManifest);
   assert.equal(fs.readFileSync(sourceAgentPath, 'utf8'), originalAgent);

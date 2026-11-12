@@ -426,6 +426,11 @@ function applyDevIdentity(stageDir) {
   if (!fs.existsSync(manifestPath)) return [];
   const skillIds = applyDevSkillIds(stageDir);
   const manifest = readJson(manifestPath);
+  // 自测通道通过 bootstrap 连接 MCP，不继承市场版的连接器引导。
+  if (manifest.dependencies) {
+    delete manifest.dependencies.connectors;
+    if (Object.keys(manifest.dependencies).length === 0) delete manifest.dependencies;
+  }
   manifest.name = PLUGIN_NAME;
   manifest.plugin = PLUGIN_NAME;
   manifest.displayName = DEV_DISPLAY_NAME;

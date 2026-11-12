@@ -49,12 +49,51 @@ test('expert ZIP ships the current quick-lookup contracts and a generated platfo
     const contents = execFileSync('unzip', ['-p', copy.archive, `${copy.root}/${relative}`]);
     assert.deepEqual(contents, fs.readFileSync(path.join(source, relative)), relative);
   }
+  const packagedManifest = JSON.parse(execFileSync('unzip', ['-p', copy.archive,
+    `${copy.root}/.codebuddy-plugin/plugin.json`], { encoding: 'utf8' }));
+  assert.deepEqual(packagedManifest.dependencies, { connectors: ['scorehub-tiktok'] });
+  const entries = execFileSync('unzip', ['-Z1', copy.archive], { encoding: 'utf8' });
+  assert.doesNotMatch(entries, /(?:^|\/)\.mcp\.json$/m);
+  assert.doesNotMatch(entries, /avatars\/scorehub-ai\.png$/m);
   const generated = execFileSync('unzip', ['-p', copy.archive,
     `${copy.root}/agents/tiktok-creator-outreach.md`], { encoding: 'utf8' });
   assert.match(generated, /scorehub-creator-message-lookup/);
+  assert.match(generated, /已上架的 ScoreHub TikTok 达人营销连接器/);
   assert.doesNotMatch(generated, /bootstrap|sharecode/);
   execFileSync('unzip', ['-tq', copy.archive], { stdio: 'pipe' });
 });
+
+for (const [name, dependencies, expected] of [
+  ['missing connector dependency', undefined, /dependencies\.connectors/],
+  ['empty connector list', { connectors: [] }, /dependencies\.connectors/],
+  ['MCP server key used as connector ID', { connectors: ['scorehub'] }, /dependencies\.connectors/],
+  ['connector ID without an array', { connectors: 'scorehub-tiktok' }, /dependencies\.connectors/],
+  ['invalid dependency object', [], /dependencies 需为对象/],
+  ['mixed embedded MCP dependency', { connectors: ['scorehub-tiktok'], mcpServers: './other.json' }, /dependencies\.mcpServers/],
+]) {
+  test(`expert packaging refuses ${name}`, (t) => {
+    const copy = fixture(t);
+    if (!copy) return;
+    const file = path.join(copy.directory, '.codebuddy-plugin', 'plugin.json');
+    fs.writeFileSync(file, JSON.stringify({ ...manifest, dependencies }));
+    const result = spawnSync('bash', [copy.script, '--skip-baseline-check'], { encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, expected);
+    assert.equal(fs.existsSync(copy.archive), false);
+  });
+}
+
+for (const relative of ['.mcp.json', 'listing/.mcp.json']) {
+  test(`expert packaging refuses a stale ${relative}`, (t) => {
+    const copy = fixture(t);
+    if (!copy) return;
+    fs.writeFileSync(path.join(copy.directory, relative), JSON.stringify({ mcpServers: {} }));
+    const result = spawnSync('bash', [copy.script, '--skip-baseline-check'], { encoding: 'utf8' });
+    assert.notEqual(result.status, 0);
+    assert.ok(result.stderr.includes(`市场连接器交付不得保留 ${relative}`));
+    assert.equal(fs.existsSync(copy.archive), false);
+  });
+}
 
 test('expert packaging refuses a missing shared task contract', (t) => {
   const copy = fixture(t);

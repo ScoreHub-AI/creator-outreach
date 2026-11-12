@@ -10,7 +10,7 @@
 #       --skip-baseline-check 跳过「工作区干净 + HEAD 已打 tag」校验，仅用于本地排查。
 #
 # 注意: 本脚本刻意不使用 pack-connector.sh 里的 `-x '*/.*'` 排除规则——专家包必须包含
-#       `.codebuddy-plugin/` 与 `.mcp.json` 两个点开头的路径，该规则会把它们静默丢掉。
+#       `.codebuddy-plugin/`，该规则会把它静默丢掉。市场连接器交付契约见 docs/MARKETPLACE_DELIVERY.md。
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -103,24 +103,18 @@ else:
         if (width, height) != (512, 512):
             errors.append(f"头像 {plugin['avatar']} 为 {width}×{height}，需为 512×512")
 
-# 依赖声明
-mcp_path = os.path.join(pkg_dir, "listing", ".mcp.json")
-icon_rel = None
-if not os.path.isfile(mcp_path):
-    errors.append("缺少上架依赖声明 listing/.mcp.json")
+# 市场连接器依赖；禁止旧内置 MCP 重新触发平台的根 .mcp.json 兜底。
+dependencies = plugin.get("dependencies", {})
+if not isinstance(dependencies, dict):
+    errors.append("dependencies 需为对象")
 else:
-    mcp = json.load(open(mcp_path, encoding="utf-8"))
-    servers = mcp.get("mcpServers", {})
-    if len(servers) != 1:
-        errors.append(f"listing/.mcp.json 只能配置 1 个 MCP Server，当前 {len(servers)} 个")
-    else:
-        icon = (servers[next(iter(servers))].get("x-workbuddy") or {}).get("icon", "")
-        if icon.startswith("./"):
-            icon_rel = icon[2:]
-            need(os.path.isfile(os.path.join(pkg_dir, icon_rel)),
-                 f"x-workbuddy.icon 指向的文件不存在: {icon}")
-        elif icon:
-            notes.append(f"x-workbuddy.icon 为外部地址，打包时不会附带本地文件: {icon}")
+    need(dependencies.get("connectors") == ["scorehub-tiktok"],
+         'dependencies.connectors 必须为 ["scorehub-tiktok"]')
+    need("mcpServers" not in dependencies,
+         "市场连接器交付不得声明 dependencies.mcpServers")
+for relative in (".mcp.json", "listing/.mcp.json"):
+    need(not os.path.lexists(os.path.join(pkg_dir, relative)),
+         f"市场连接器交付不得保留 {relative}")
 
 if errors:
     print("\n".join("  " + e for e in errors), file=sys.stderr)
@@ -131,7 +125,6 @@ for note in notes:
 print(f"NAME={plugin['name']}")
 print(f"VERSION={plugin['version']}")
 print(f"AVATAR={plugin['avatar']}")
-print(f"ICON={icon_rel or ''}")
 print(f"AGENT=agents/{plugin['agentName']}.md")
 PY
 )" || fail "plugin.json 校验未通过（详见上方）"
@@ -139,7 +132,6 @@ PY
 NAME="$(sed -n 's/^NAME=//p' <<<"$META")"
 VERSION="$(sed -n 's/^VERSION=//p' <<<"$META")"
 AVATAR="$(sed -n 's/^AVATAR=//p' <<<"$META")"
-ICON="$(sed -n 's/^ICON=//p' <<<"$META")"
 AGENT="$(sed -n 's/^AGENT=//p' <<<"$META")"
 
 [[ -n "$NAME" && -n "$VERSION" ]] || fail "无法从 plugin.json 解析 name / version"
@@ -200,10 +192,6 @@ cp -R "$PKG_DIR/.codebuddy-plugin" "$TREE_DIR/"
 cp -R "$PKG_DIR/skills" "$TREE_DIR/"
 mkdir -p "$TREE_DIR/avatars"
 cp "$PKG_DIR/$AVATAR" "$TREE_DIR/avatars/"
-if [[ -n "$ICON" ]]; then
-  cp "$PKG_DIR/$ICON" "$TREE_DIR/avatars/"
-fi
-cp "$PKG_DIR/listing/.mcp.json" "$TREE_DIR/.mcp.json"
 cp "$PKG_DIR/listing/README.md" "$TREE_DIR/README.md"
 
 # 保留 Agent 补充与共享 Reference，再用生成器替换主正文。
@@ -213,10 +201,11 @@ python3 "$SCRIPT_DIR/build-platform-agent.py" "$AGENT_SRC" "$TREE_DIR/$AGENT"
 find "$TREE_DIR" -name '.DS_Store' -delete
 
 # ------------------------------------------------------------- 3. 交付物自检
-CLEAN_REFS=("agents" "skills" "avatars" ".codebuddy-plugin" ".mcp.json" "README.md")
+CLEAN_REFS=("agents" "skills" "avatars" ".codebuddy-plugin" "README.md")
 for ref in "${CLEAN_REFS[@]}"; do
   [[ -e "$TREE_DIR/$ref" ]] || fail "打包结果缺少 $ref"
 done
+[[ ! -e "$TREE_DIR/.mcp.json" ]] || fail "市场连接器交付不得包含根 .mcp.json"
 
 python3 - "$TREE_DIR" <<'PY'
 from pathlib import Path
